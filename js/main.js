@@ -259,14 +259,17 @@ function renderUnrecognized(list) {
     const hint = document.createElement("div");
     hint.className = "hint";
     hint.innerHTML =
-      "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée. " +
-      "Reprenez-le ci-dessous en le mettant à ce format, par exemple :" +
+      "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée — un PDF ou Word " +
+      "n'a en général plus ni titres ni gras une fois le texte récupéré, tout est à plat. Exemple, tel " +
+      "qu'il arrive souvent depuis un PDF :" +
+      "<pre class=\"example-block\">Quelle est la capitale de la France ? A Lyon B Paris C Marseille</pre>" +
+      "Il faut le réécrire ainsi, dans la zone ci-dessous :" +
       "<pre class=\"example-block\">## Question 1 — Capitale de la France\n" +
       "**Quelle est la capitale de la France ?**\n" +
       "- [ ] **A.** Lyon\n" +
       "- [ ] **B.** Paris\n" +
       "- [ ] **C.** Marseille</pre>" +
-      "puis collez le résultat dans la zone de texte ci-dessus (le bouton « Coller du texte », au début de cette étape). " +
+      "Puis cliquez sur « Coller du texte » (en haut de cette étape) et collez-y le résultat. " +
       "Une bonne réponse pourra ensuite être cochée directement dans la liste des questions, à l'étape suivante — inutile de l'indiquer ici.";
 
     const ta = document.createElement("textarea");
