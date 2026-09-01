@@ -263,14 +263,22 @@ function renderUnrecognized(list) {
       "n'a en général plus ni titres ni gras une fois le texte récupéré, tout est à plat. Exemple, tel " +
       "qu'il arrive souvent depuis un PDF :" +
       "<pre class=\"example-block\">Quelle est la capitale de la France ? A Lyon B Paris C Marseille</pre>" +
-      "Il faut le réécrire ainsi, dans la zone ci-dessous :" +
+      "Il faut le réécrire ainsi :" +
       "<pre class=\"example-block\">## Question 1 — Capitale de la France\n" +
       "**Quelle est la capitale de la France ?**\n" +
       "- [ ] **A.** Lyon\n" +
       "- [ ] **B.** Paris\n" +
       "- [ ] **C.** Marseille</pre>" +
-      "Puis cliquez sur « Coller du texte » (en haut de cette étape) et collez-y le résultat. " +
-      "Une bonne réponse pourra ensuite être cochée directement dans la liste des questions, à l'étape suivante — inutile de l'indiquer ici.";
+      "<strong>Si questions et corrigé sont dans deux documents séparés</strong> (comme ici), " +
+      "pas besoin de les fusionner : réécrivez chacun dans son propre format, puis collez-les " +
+      "l'un après l'autre (bouton « Coller du texte », deux fois) — le rapprochement entre une " +
+      "question et sa bonne réponse se fait automatiquement par numéro. Le corrigé se réécrit " +
+      "ainsi (le nom de l'option suffit, pas besoin de répéter les 4 options) :" +
+      "<pre class=\"example-block\">## Question 1 — Réponses A et C\n" +
+      "- **A — Correct.** ...\n" +
+      "- **B — Incorrect.** ...</pre>" +
+      "Une fois collé, chaque texte reconstruit rejoint automatiquement la liste des questions " +
+      "à l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà collé.";
 
     const ta = document.createElement("textarea");
     ta.value = item.text;
