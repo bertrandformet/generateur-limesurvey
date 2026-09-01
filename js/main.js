@@ -436,7 +436,7 @@ function renderQuestionList() {
 
     const codeSpan = document.createElement("span");
     codeSpan.className = "q-code";
-    codeSpan.textContent = `${q.code} — ${q.type === "L" ? "choix unique" : "cases à cocher"}`;
+    codeSpan.textContent = q.type === "L" ? "choix unique" : "cases à cocher";
 
     const weightLabel = document.createElement("label");
     weightLabel.className = "q-weight-label";
