@@ -356,11 +356,63 @@ function renderUnrecognized() {
 
 // --- Selection + inline editing ----------------------------------------------
 
+let dragCode = null;
+
+function reorderQuestion(draggedCode, targetCode, after) {
+  const list = state.importedQuestions;
+  const fromIdx = list.findIndex((q) => q.code === draggedCode);
+  if (fromIdx === -1) return;
+  const [moved] = list.splice(fromIdx, 1);
+  let toIdx = list.findIndex((q) => q.code === targetCode);
+  if (toIdx === -1) toIdx = list.length;
+  else if (after) toIdx += 1;
+  list.splice(toIdx, 0, moved);
+}
+
 function renderQuestionList() {
   questionList.innerHTML = "";
   state.importedQuestions.forEach((q) => {
     const row = document.createElement("div");
     row.className = "question-item";
+    row.dataset.code = q.code;
+
+    const handle = document.createElement("span");
+    handle.className = "q-drag-handle";
+    handle.title = "Glisser pour réordonner";
+    handle.textContent = "⠿";
+    handle.draggable = true;
+
+    handle.addEventListener("dragstart", (e) => {
+      dragCode = q.code;
+      row.classList.add("is-dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    handle.addEventListener("dragend", () => {
+      dragCode = null;
+      row.classList.remove("is-dragging");
+      questionList.querySelectorAll(".drop-before, .drop-after").forEach((el) => el.classList.remove("drop-before", "drop-after"));
+    });
+    row.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (dragCode === null || dragCode === q.code) return;
+      const rect = row.getBoundingClientRect();
+      const after = e.clientY - rect.top > rect.height / 2;
+      row.classList.toggle("drop-after", after);
+      row.classList.toggle("drop-before", !after);
+    });
+    row.addEventListener("dragleave", () => {
+      row.classList.remove("drop-before", "drop-after");
+    });
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      row.classList.remove("drop-before", "drop-after");
+      if (dragCode === null || dragCode === q.code) return;
+      const rect = row.getBoundingClientRect();
+      const after = e.clientY - rect.top > rect.height / 2;
+      reorderQuestion(dragCode, q.code, after);
+      renderQuestionList();
+      renderPreview();
+    });
 
     const cb = document.createElement("input");
     cb.type = "checkbox";
@@ -460,6 +512,7 @@ function renderQuestionList() {
     body.appendChild(textInput);
     body.appendChild(optionsWrap);
 
+    row.appendChild(handle);
     row.appendChild(cb);
     row.appendChild(body);
     questionList.appendChild(row);
