@@ -170,6 +170,19 @@ textarea#paste-area {
   font-weight: 600;
   margin-bottom: 6px;
 }
+.example-block {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: var(--code-bg);
+  border-radius: 6px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 .unrecognized-item textarea {
   width: 100%;
   min-height: 120px;

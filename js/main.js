@@ -258,7 +258,16 @@ function renderUnrecognized(list) {
 
     const hint = document.createElement("div");
     hint.className = "hint";
-    hint.textContent = "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée. Relisez-le ci-dessous, adaptez-le au format attendu (gabarit CSV, ou titres « Question N » + options « - [ ] **A.** ... » en Markdown), puis collez-le dans la zone de texte ci-dessus.";
+    hint.innerHTML =
+      "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée. " +
+      "Reprenez-le ci-dessous en le mettant à ce format, par exemple :" +
+      "<pre class=\"example-block\">## Question 1 — Capitale de la France\n" +
+      "**Quelle est la capitale de la France ?**\n" +
+      "- [ ] **A.** Lyon\n" +
+      "- [ ] **B.** Paris\n" +
+      "- [ ] **C.** Marseille</pre>" +
+      "puis collez le résultat dans la zone de texte ci-dessus (le bouton « Coller du texte », au début de cette étape). " +
+      "Une bonne réponse pourra ensuite être cochée directement dans la liste des questions, à l'étape suivante — inutile de l'indiquer ici.";
 
     const ta = document.createElement("textarea");
     ta.value = item.text;
