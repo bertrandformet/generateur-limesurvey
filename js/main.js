@@ -373,7 +373,9 @@ function renderUnrecognized() {
     "les fusionner : réécrivez chacun dans son propre format ci-dessous (un panneau par document) et " +
     "validez-les séparément — le rapprochement se fait ensuite automatiquement par numéro de question. " +
     "Une fois validé, chaque texte reconstruit rejoint automatiquement la liste des questions à " +
-    "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé.";
+    "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé. " +
+    "Vous pouvez aussi tout regrouper dans un seul des panneaux ci-dessous et ignorer les autres avec " +
+    "le bouton « Ignorer ce document ».";
   unrecognizedBox.appendChild(hint);
 
   list.forEach((item) => {
@@ -405,7 +407,19 @@ function renderUnrecognized() {
       }
     });
 
+    const dismissBtn = document.createElement("button");
+    dismissBtn.type = "button";
+    dismissBtn.className = "link-btn";
+    dismissBtn.textContent = "Ignorer ce document";
+    dismissBtn.title = "Ne pas traiter ce texte (par exemple si vous l'avez déjà recopié dans un autre panneau)";
+    dismissBtn.addEventListener("click", () => {
+      const idx = state.unrecognized.indexOf(item);
+      if (idx !== -1) state.unrecognized.splice(idx, 1);
+      renderUnrecognized();
+    });
+
     actionRow.appendChild(retryBtn);
+    actionRow.appendChild(dismissBtn);
     actionRow.appendChild(status);
 
     box.appendChild(title);
