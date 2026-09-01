@@ -93,6 +93,21 @@ h1 {
   font-size: 0.9em;
 }
 
+.hint-details {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 16px;
+}
+.hint-details summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 13px;
+  user-select: none;
+}
+.hint-details summary:hover { text-decoration: underline; }
+.hint-details p { margin: 10px 0 6px; }
+.hint-details .example-block { margin: 6px 0; }
+
 .link-btn {
   background: none;
   border: none;
