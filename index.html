@@ -106,9 +106,9 @@
       <div id="fields-list" class="fields-list"></div>
       <div class="add-field-form">
         <div class="add-field-kind">
-          <label class="radio-label"><input type="radio" name="new-field-kind" value="field" checked> Champ à remplir</label>
-          <label class="radio-label"><input type="radio" name="new-field-kind" value="text"> Texte d'information (pas de saisie)</label>
-          <label class="radio-label"><input type="radio" name="new-field-kind" value="image"> Image</label>
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="field" class="visually-hidden" checked> Champ à remplir</label>
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="text" class="visually-hidden"> Texte d'information</label>
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="image" class="visually-hidden"> Image</label>
         </div>
         <input type="text" id="new-field-label" placeholder="Libellé du champ (ex. Prénom)">
         <textarea id="new-field-text" class="hidden" rows="3" placeholder="Texte à afficher (peut contenir du HTML simple, ex. <strong>...</strong>)"></textarea>
@@ -169,8 +169,9 @@
 </main>
 
 <footer>
-  Génération d'un fichier .lss (structure d'enquête LimeSurvey) directement dans le navigateur, aucune donnée envoyée à un serveur.<br>
-  <a href="LICENSE">CC BY 4.0</a> — Bertrand Formet
+  Génération d'un fichier .lss (structure d'enquête LimeSurvey) directement dans le navigateur.<br>
+  Aucune donnée envoyée à un serveur.<br>
+  <a href="LICENSE">CC BY 4.0</a> — <a href="https://github.com/bertrandformet/generateur-limesurvey" target="_blank" rel="noopener">Bertrand Formet</a>
 </footer>
 
 <script type="module" src="js/main.js"></script>
