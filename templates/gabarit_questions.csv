@@ -1,0 +1,4 @@
+code;type;texte;option_a;option_b;option_c;option_d;correct;coefficient
+Q1;L;Quelle est la capitale de la France ?;Lyon;Paris;Marseille;;B;1
+Q2;M;Cochez les nombres pairs ;2;3;4;5;"A,C";2
+Q3;T;Autres remarques (réponse libre, non notée);;;;;;

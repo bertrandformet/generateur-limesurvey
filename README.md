@@ -29,10 +29,12 @@ envoyée à un serveur.
 3. L'enquête est créée à l'état inactif : relisez-la, puis activez-la
    quand vous êtes prêt.
 
-## Format d'import (CSV/TSV)
+## Format d'import (CSV/TSV/Excel)
 
-Pour un import garanti sans ajustement, utilisez ce gabarit (téléchargeable
-directement depuis l'outil) :
+Pour un import garanti sans ajustement, utilisez ce gabarit ([télécharger le
+fichier](templates/gabarit_questions.csv), aussi téléchargeable directement
+depuis l'outil) — il s'ouvre normalement dans Excel ou LibreOffice Calc, et
+un fichier `.xlsx`/`.xls` au même gabarit est importé de la même façon :
 
 ```
 code;type;texte;option_a;option_b;option_c;option_d;correct;coefficient
@@ -55,7 +57,9 @@ Q3;T;Autres remarques (réponse libre, non notée);;;;;;
 Un fichier Word, PDF ou Markdown peut aussi être importé directement : s'il
 suit une mise en page reconnaissable, les questions sont détectées
 automatiquement ; sinon, le texte est extrait et affiché pour un ajustement
-manuel avant réimport (un gabarit est aussi téléchargeable depuis l'outil).
+manuel avant réimport. Gabarit : [télécharger le
+fichier](templates/gabarit_questions.md) (aussi téléchargeable depuis
+l'outil).
 
 ```
 ## Question 1 — Capitale de la France
