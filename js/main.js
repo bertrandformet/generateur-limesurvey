@@ -13,6 +13,7 @@ const el = (id) => document.getElementById(id);
 
 const fileInput = el("file-input");
 const dropzone = el("dropzone");
+const pasteBox = el("paste-box");
 const pasteToggleBtn = el("btn-paste-toggle");
 const pasteArea = el("paste-area");
 const parseBtn = el("btn-parse");
@@ -153,6 +154,21 @@ templateMdBtn.addEventListener("click", () => {
 pasteToggleBtn.addEventListener("click", () => {
   pasteArea.classList.toggle("hidden");
   parseBtn.classList.toggle("hidden");
+});
+
+// Make the whole card clickable, not just the button inside it — but let
+// a direct click on the button itself go through its own handler above
+// rather than firing this too (which would immediately toggle back).
+pasteBox.addEventListener("click", (e) => {
+  if (e.target === pasteToggleBtn) return;
+  pasteToggleBtn.click();
+});
+
+// Same for the dropzone: click anywhere to open the file picker, except
+// on the file input itself (it already opens its own picker natively).
+dropzone.addEventListener("click", (e) => {
+  if (e.target === fileInput) return;
+  fileInput.click();
 });
 
 fileInput.addEventListener("change", async () => {
