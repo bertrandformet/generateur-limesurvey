@@ -19,48 +19,44 @@ const templateBtn = el("btn-template");
 const templateMdBtn = el("btn-template-md");
 const warningsBox = el("import-warnings");
 
-const stepImport = el("step-import");
 const stepSelect = el("step-select");
 const stepFields = el("step-fields");
 const stepPreview = el("step-preview");
 const stepGenerate = el("step-generate");
 
 // --- Progress indicator ---------------------------------------------------
-// A single dot sliding along a 1..5 line, tracking whichever step section
-// the user has scrolled down to (only counting steps currently unlocked —
-// hidden ones keep display:none and are skipped).
+// A single dot sliding along a 1..5 line. Deliberately not scroll-driven:
+// it only advances on an explicit milestone (import succeeded, or a
+// step's own "Valider" button) so it reflects actual engagement with each
+// step rather than incidental scrolling — a high-water mark that never
+// moves back.
 
-const progressSteps = [stepImport, stepSelect, stepFields, stepPreview, stepGenerate];
+const PROGRESS_STEP_COUNT = 5;
 const progressFill = el("progress-fill");
 const progressDot = el("progress-dot");
 const progressLabelEls = document.querySelectorAll("#progress-labels span");
+let progressStep = 0;
 
-function updateProgress() {
-  const refY = 140; // px from viewport top — just below the sticky bar itself
-  let current = 0;
-  progressSteps.forEach((sec, i) => {
-    if (!sec || sec.style.display === "none") return;
-    if (sec.getBoundingClientRect().top <= refY) current = i;
-  });
-  const pct = (current / (progressSteps.length - 1)) * 100;
+function setProgress(step) {
+  progressStep = Math.max(progressStep, step);
+  const pct = (progressStep / (PROGRESS_STEP_COUNT - 1)) * 100;
   progressFill.style.width = `${pct}%`;
   progressDot.style.left = `${pct}%`;
-  progressLabelEls.forEach((span, i) => span.classList.toggle("is-current", i === current));
+  progressLabelEls.forEach((span, i) => span.classList.toggle("is-current", i === progressStep));
 }
 
-let progressRaf = null;
-window.addEventListener(
-  "scroll",
-  () => {
-    if (progressRaf) return;
-    progressRaf = requestAnimationFrame(() => {
-      progressRaf = null;
-      updateProgress();
-    });
-  },
-  { passive: true }
-);
-window.addEventListener("resize", updateProgress);
+function wireValidateButton(btnId, statusId, step, message) {
+  const btn = el(btnId);
+  const status = el(statusId);
+  btn.addEventListener("click", () => {
+    setProgress(step);
+    status.textContent = message;
+  });
+}
+
+wireValidateButton("btn-validate-select", "validate-select-status", 2, "Sélection validée.");
+wireValidateButton("btn-validate-fields", "validate-fields-status", 3, "Champs validés.");
+wireValidateButton("btn-validate-preview", "validate-preview-status", 4, "Aperçu validé.");
 
 const questionList = el("question-list");
 const selectCount = el("select-count");
@@ -320,7 +316,7 @@ function finishImport(warnings) {
   stepFields.style.display = has ? "grid" : "none";
   stepPreview.style.display = has ? "grid" : "none";
   stepGenerate.style.display = has ? "grid" : "none";
-  updateProgress();
+  if (has) setProgress(1);
 }
 
 function renderWarnings() {
@@ -837,6 +833,7 @@ generateBtn.addEventListener("click", () => {
 
   const filename = title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "questionnaire";
   downloadBlob(`${filename}.lss`, xml, "application/xml;charset=utf-8");
+  setProgress(4);
 });
 
-updateProgress();
+setProgress(0);

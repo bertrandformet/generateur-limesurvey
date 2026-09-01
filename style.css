@@ -185,6 +185,19 @@ h1 {
 }
 .secondary-btn:hover { background: var(--accent-soft); }
 
+.step-validate-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+}
+.validate-status {
+  font-size: 13px;
+  color: var(--accent);
+}
+
 .primary-btn {
   background: var(--accent);
   color: #fff;
