@@ -54,13 +54,20 @@
     <div class="step-num">3</div>
     <div class="step-body">
       <h2>Champs additionnels</h2>
-      <p class="hint">Des champs à insérer où vous voulez dans le questionnaire (ex. nom, prénom, établissement) — au début, à la fin, ou juste après une question précise.</p>
+      <p class="hint">Des champs à remplir (nom, prénom, établissement...) ou du texte d'information sans saisie (consigne, rappel...) — à insérer où vous voulez : au début, à la fin, ou juste après une question précise.</p>
       <div id="fields-list" class="fields-list"></div>
-      <div class="add-field-row">
+      <div class="add-field-form">
+        <div class="add-field-kind">
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="field" checked> Champ à remplir</label>
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="text"> Texte d'information (pas de saisie)</label>
+        </div>
         <input type="text" id="new-field-label" placeholder="Libellé du champ (ex. Prénom)">
-        <select id="new-field-position"></select>
-        <label class="checkbox-label"><input type="checkbox" id="new-field-mandatory"> Obligatoire</label>
-        <button type="button" id="btn-add-field" class="secondary-btn">Ajouter</button>
+        <textarea id="new-field-text" class="hidden" rows="3" placeholder="Texte à afficher (peut contenir du HTML simple, ex. <strong>...</strong>)"></textarea>
+        <div class="add-field-row">
+          <select id="new-field-position"></select>
+          <label class="checkbox-label" id="new-field-mandatory-wrap"><input type="checkbox" id="new-field-mandatory"> Obligatoire</label>
+          <button type="button" id="btn-add-field" class="secondary-btn">Ajouter</button>
+        </div>
       </div>
     </div>
   </section>
@@ -84,13 +91,23 @@
       <div id="generate-summary" class="summary"></div>
       <div id="lint-report" class="lint-report"></div>
       <button type="button" id="btn-generate" class="primary-btn">Générer le fichier .lss</button>
+
+      <div class="import-steps">
+        <p class="import-steps-title">Ensuite, dans LimeSurvey :</p>
+        <ol>
+          <li>Enquêtes → Créer une enquête → Importer une enquête</li>
+          <li>Sélectionnez le fichier <code>.lss</code> téléchargé et validez l'import</li>
+          <li>L'enquête est créée inactive : relisez-la, puis activez-la</li>
+        </ol>
+      </div>
     </div>
   </section>
 
 </main>
 
 <footer>
-  Génère un fichier .lss (structure d'enquête LimeSurvey) directement dans votre navigateur — rien n'est envoyé à un serveur.
+  Génère un fichier .lss (structure d'enquête LimeSurvey) directement dans votre navigateur — rien n'est envoyé à un serveur.<br>
+  <a href="LICENSE">CC BY 4.0</a> — Bertrand Formet
 </footer>
 
 <script type="module" src="js/main.js"></script>

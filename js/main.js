@@ -31,10 +31,26 @@ const selectNoneBtn = el("btn-select-none");
 const unrecognizedBox = el("unrecognized-box");
 
 const fieldsList = el("fields-list");
+const newFieldKindInputs = document.getElementsByName("new-field-kind");
 const newFieldLabel = el("new-field-label");
+const newFieldText = el("new-field-text");
 const newFieldPosition = el("new-field-position");
 const newFieldMandatory = el("new-field-mandatory");
+const newFieldMandatoryWrap = el("new-field-mandatory-wrap");
 const addFieldBtn = el("btn-add-field");
+
+function currentFieldKind() {
+  return Array.from(newFieldKindInputs).find((r) => r.checked)?.value || "field";
+}
+
+function updateAddFieldFormVisibility() {
+  const isText = currentFieldKind() === "text";
+  newFieldLabel.classList.toggle("hidden", isText);
+  newFieldText.classList.toggle("hidden", !isText);
+  newFieldMandatoryWrap.classList.toggle("hidden", isText);
+}
+newFieldKindInputs.forEach((r) => r.addEventListener("change", updateAddFieldFormVisibility));
+updateAddFieldFormVisibility();
 
 const previewList = el("preview-list");
 
@@ -429,15 +445,18 @@ function positionLabel(position) {
 }
 
 addFieldBtn.addEventListener("click", () => {
-  const label = newFieldLabel.value.trim();
-  if (!label) return;
+  const kind = currentFieldKind();
+  const content = kind === "text" ? newFieldText.value.trim() : newFieldLabel.value.trim();
+  if (!content) return;
   state.customFields.push({
-    code: makeFieldCode(label),
-    label,
-    mandatory: newFieldMandatory.checked,
+    code: makeFieldCode(kind === "text" ? "texte" : content),
+    kind,
+    label: content,
+    mandatory: kind === "field" && newFieldMandatory.checked,
     position: positionFromSelectValue(newFieldPosition.value),
   });
   newFieldLabel.value = "";
+  newFieldText.value = "";
   newFieldMandatory.checked = false;
   renderFieldsList();
   renderPreview();
@@ -452,7 +471,9 @@ function renderFieldsList() {
 
     const label = document.createElement("span");
     label.className = "field-label";
-    label.textContent = f.label + (f.mandatory ? " *" : "");
+    const kindPrefix = f.kind === "text" ? "[texte] " : "";
+    const shortLabel = f.label.length > 60 ? f.label.slice(0, 60) + "…" : f.label;
+    label.textContent = kindPrefix + shortLabel + (f.mandatory ? " *" : "");
 
     const posTag = document.createElement("span");
     posTag.className = "field-position";
@@ -496,7 +517,7 @@ function renderPreview() {
 
   sequence.forEach((item, i) => {
     const row = document.createElement("div");
-    row.className = "preview-row" + (item.kind === "field" ? " is-field" : "");
+    row.className = "preview-row" + (item.kind === "field" || item.kind === "text" ? " is-field" : "");
 
     const index = document.createElement("div");
     index.className = "p-index";
@@ -511,6 +532,12 @@ function renderPreview() {
       tag.textContent = "champ";
       body.appendChild(tag);
       body.appendChild(document.createTextNode(item.label + (item.mandatory ? " (obligatoire)" : " (optionnel)")));
+    } else if (item.kind === "text") {
+      const tag = document.createElement("span");
+      tag.className = "p-tag";
+      tag.textContent = "texte";
+      body.appendChild(tag);
+      body.appendChild(document.createTextNode(item.label));
     } else {
       const tag = document.createElement("span");
       tag.className = "p-tag";

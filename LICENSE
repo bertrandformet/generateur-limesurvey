@@ -1,0 +1,31 @@
+Générateur de questionnaire LimeSurvey
+Copyright (c) 2026 Bertrand Formet
+
+This work is licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0).
+
+To view a copy of this license, visit
+https://creativecommons.org/licenses/by/4.0/
+or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+--------------------------------------------------------------------------
+
+Vous êtes autorisé à :
+- Partager — copier, distribuer et communiquer le matériel par tout moyen
+  et sous tout format
+- Adapter — remixer, transformer et créer à partir du matériel
+  pour toute utilisation, y compris commerciale
+
+Selon les conditions suivantes :
+- Attribution — Vous devez créditer l'œuvre, intégrer un lien vers la
+  licence et indiquer si des modifications ont été effectuées. Vous devez
+  indiquer ces informations par tous les moyens raisonnables, sans
+  toutefois suggérer que Bertrand Formet vous soutient ou soutient la
+  façon dont vous avez utilisé son œuvre.
+
+Aucune clause de cette licence ne diminue ni ne restreint le droit moral
+de l'auteur.
+
+Note : `js/import/converters/` est vendorisé depuis le projet
+mdfusion (github.com/bertrandformet/mdfusion), également de Bertrand
+Formet, et reste soumis aux mêmes conditions.

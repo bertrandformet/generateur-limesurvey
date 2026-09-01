@@ -363,6 +363,20 @@ select#new-field-position {
   font-size: 13px;
 }
 
+.add-field-form { display: flex; flex-direction: column; gap: 10px; }
+.add-field-kind { display: flex; gap: 18px; }
+.radio-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); }
+#new-field-label { width: 100%; }
+#new-field-text {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--surface);
+  color: var(--ink);
+}
 .add-field-row { display: flex; align-items: center; gap: 10px; }
 .add-field-row input[type="text"] { flex: 1; }
 .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
@@ -403,4 +417,33 @@ footer {
   border-top: 1px solid var(--rule);
   font-size: 12.5px;
   color: var(--ink-faint);
+  line-height: 1.8;
+}
+footer a { color: var(--ink-faint); }
+
+.import-steps {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border-radius: 8px;
+}
+.import-steps-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.import-steps ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.import-steps li { margin-bottom: 4px; }
+.import-steps code {
+  background: var(--code-bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
 }
