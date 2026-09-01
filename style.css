@@ -658,45 +658,64 @@ select#new-field-position {
 .preview-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font-size: 13.5px;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  gap: 8px;
 }
 .preview-row {
   display: flex;
-  gap: 10px;
-  padding: 9px 12px;
+  gap: 12px;
+  padding: 12px 14px;
   background: var(--surface);
-  border-bottom: 1px solid var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-.preview-row:last-child { border-bottom: none; }
-.preview-row.is-field { background: var(--accent-soft); }
+.preview-row.is-field { background: var(--accent-soft); border-color: var(--accent-soft); }
 .preview-row .p-index {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 11px;
+  font-family: "Archivo", sans-serif;
+  font-weight: 800;
+  font-size: 15px;
   color: var(--ink-faint);
   width: 20px;
   flex-shrink: 0;
+  text-align: right;
   padding-top: 1px;
 }
 .preview-row .p-body { flex: 1; min-width: 0; }
+.p-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
 .preview-row .p-tag {
   font-family: "JetBrains Mono", monospace;
   font-size: 10.5px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-right: 6px;
 }
-.preview-row .p-options {
-  font-size: 12px;
+.p-points {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
   color: var(--ink-faint);
-  margin-top: 3px;
 }
-.preview-row .p-options strong { color: var(--accent); font-weight: 600; }
+.p-question {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.p-option-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  color: var(--ink-faint);
+}
+.p-option-list li.is-correct { color: var(--accent); font-weight: 600; }
 .field-item .remove-field {
   background: none;
   border: none;

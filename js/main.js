@@ -892,6 +892,33 @@ function renderPreview() {
     return;
   }
 
+  // A tag + optional right-aligned points/status badge, on their own row —
+  // kept separate from the question/label text below it (previously the
+  // tag ran directly into the text with no line break, which read as a
+  // wall of text rather than a structured preview).
+  function buildMeta(tagText, statusText) {
+    const meta = document.createElement("div");
+    meta.className = "p-meta";
+    const tag = document.createElement("span");
+    tag.className = "p-tag";
+    tag.textContent = tagText;
+    meta.appendChild(tag);
+    if (statusText) {
+      const status = document.createElement("span");
+      status.className = "p-points";
+      status.textContent = statusText;
+      meta.appendChild(status);
+    }
+    return meta;
+  }
+
+  function buildQuestionText(text) {
+    const p = document.createElement("p");
+    p.className = "p-question";
+    p.textContent = text;
+    return p;
+  }
+
   sequence.forEach((item, i) => {
     const row = document.createElement("div");
     row.className = "preview-row" + (item.kind === "field" || item.kind === "text" || item.kind === "image" ? " is-field" : "");
@@ -904,48 +931,36 @@ function renderPreview() {
     body.className = "p-body";
 
     if (item.kind === "field") {
-      const tag = document.createElement("span");
-      tag.className = "p-tag";
-      tag.textContent = "champ";
-      body.appendChild(tag);
-      body.appendChild(document.createTextNode(item.label + (item.mandatory ? " (obligatoire)" : " (optionnel)")));
+      body.appendChild(buildMeta("Champ"));
+      body.appendChild(buildQuestionText(item.label + (item.mandatory ? " (obligatoire)" : " (optionnel)")));
     } else if (item.kind === "text") {
-      const tag = document.createElement("span");
-      tag.className = "p-tag";
-      tag.textContent = "texte";
-      body.appendChild(tag);
-      body.appendChild(document.createTextNode(item.label));
+      body.appendChild(buildMeta("Texte"));
+      body.appendChild(buildQuestionText(item.label));
     } else if (item.kind === "image") {
-      const tag = document.createElement("span");
-      tag.className = "p-tag";
-      tag.textContent = "image";
-      body.appendChild(tag);
-      body.appendChild(document.createTextNode(item.displayName || ""));
+      body.appendChild(buildMeta("Image"));
+      body.appendChild(buildQuestionText(item.displayName || ""));
       const thumb = document.createElement("div");
       thumb.className = "p-image-thumb";
       thumb.innerHTML = item.label;
       body.appendChild(thumb);
     } else if (item.type === "T") {
-      const tag = document.createElement("span");
-      tag.className = "p-tag";
-      tag.textContent = "réponse libre (non notée)";
-      body.appendChild(tag);
-      body.appendChild(document.createTextNode(item.text));
+      body.appendChild(buildMeta("Réponse libre", "Non notée"));
+      body.appendChild(buildQuestionText(item.text));
     } else {
       const scored = item.scored !== false;
-      const tag = document.createElement("span");
-      tag.className = "p-tag";
-      const kindLabel = item.type === "L" ? "choix unique" : "cases à cocher";
+      const kindLabel = item.type === "L" ? "Choix unique" : "Cases à cocher";
       const weight = item.weight && item.weight > 0 ? item.weight : 1;
-      tag.textContent = scored ? `${kindLabel} · ${weight} pt${weight > 1 ? "s" : ""}` : `${kindLabel} (non notée)`;
-      body.appendChild(tag);
-      body.appendChild(document.createTextNode(item.text));
+      body.appendChild(buildMeta(kindLabel, scored ? `${weight} pt${weight > 1 ? "s" : ""}` : "Non notée"));
+      body.appendChild(buildQuestionText(item.text));
 
-      const opts = document.createElement("div");
-      opts.className = "p-options";
-      opts.innerHTML = item.options
-        .map((o) => (scored && item.correct.includes(o.code) ? `<strong>${o.code}. ${escapeHtml(o.text)}</strong>` : `${o.code}. ${escapeHtml(o.text)}`))
-        .join(" &nbsp;·&nbsp; ");
+      const opts = document.createElement("ul");
+      opts.className = "p-option-list";
+      item.options.forEach((o) => {
+        const li = document.createElement("li");
+        li.className = scored && item.correct.includes(o.code) ? "is-correct" : "";
+        li.textContent = `${o.code}. ${o.text}`;
+        opts.appendChild(li);
+      });
       body.appendChild(opts);
     }
 
