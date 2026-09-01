@@ -88,7 +88,9 @@ Tout se passe dans le navigateur, rien n'est envoyé à un serveur. Les
 fichiers, les questions, les modifications ne sont jamais transmis nulle
 part : l'outil ne dispose d'ailleurs d'aucun serveur à qui les envoyer.
 Rien n'est conservé non plus d'une visite à l'autre : fermer ou recharger
-la page efface tout ce qui a été importé ou saisi.
+la page efface tout ce qui a été importé ou saisi — seule exception, la
+préférence de thème clair/sombre, mémorisée localement pour la prochaine
+visite.
 
 Seule exception : au premier import d'un PDF, DOCX ou XLSX, le navigateur
 télécharge la bibliothèque nécessaire à sa lecture (ex. pdf.js) depuis un
