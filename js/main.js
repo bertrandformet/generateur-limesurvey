@@ -19,10 +19,48 @@ const templateBtn = el("btn-template");
 const templateMdBtn = el("btn-template-md");
 const warningsBox = el("import-warnings");
 
+const stepImport = el("step-import");
 const stepSelect = el("step-select");
 const stepFields = el("step-fields");
 const stepPreview = el("step-preview");
 const stepGenerate = el("step-generate");
+
+// --- Progress indicator ---------------------------------------------------
+// A single dot sliding along a 1..5 line, tracking whichever step section
+// the user has scrolled down to (only counting steps currently unlocked —
+// hidden ones keep display:none and are skipped).
+
+const progressSteps = [stepImport, stepSelect, stepFields, stepPreview, stepGenerate];
+const progressFill = el("progress-fill");
+const progressDot = el("progress-dot");
+const progressLabelEls = document.querySelectorAll("#progress-labels span");
+
+function updateProgress() {
+  const refY = 140; // px from viewport top — just below the sticky bar itself
+  let current = 0;
+  progressSteps.forEach((sec, i) => {
+    if (!sec || sec.style.display === "none") return;
+    if (sec.getBoundingClientRect().top <= refY) current = i;
+  });
+  const pct = (current / (progressSteps.length - 1)) * 100;
+  progressFill.style.width = `${pct}%`;
+  progressDot.style.left = `${pct}%`;
+  progressLabelEls.forEach((span, i) => span.classList.toggle("is-current", i === current));
+}
+
+let progressRaf = null;
+window.addEventListener(
+  "scroll",
+  () => {
+    if (progressRaf) return;
+    progressRaf = requestAnimationFrame(() => {
+      progressRaf = null;
+      updateProgress();
+    });
+  },
+  { passive: true }
+);
+window.addEventListener("resize", updateProgress);
 
 const questionList = el("question-list");
 const selectCount = el("select-count");
@@ -282,6 +320,7 @@ function finishImport(warnings) {
   stepFields.style.display = has ? "grid" : "none";
   stepPreview.style.display = has ? "grid" : "none";
   stepGenerate.style.display = has ? "grid" : "none";
+  updateProgress();
 }
 
 function renderWarnings() {
@@ -785,3 +824,5 @@ generateBtn.addEventListener("click", () => {
   const filename = title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "questionnaire";
   downloadBlob(`${filename}.lss`, xml, "application/xml;charset=utf-8");
 });
+
+updateProgress();
