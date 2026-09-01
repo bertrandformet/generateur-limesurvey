@@ -1,33 +1,48 @@
 :root {
-  --bg: #F3F4F1;
+  --bg: #E7EBE9;
   --surface: #FFFFFF;
-  --panel: #E9ECE7;
-  --ink: #1B211F;
-  --ink-soft: #5B655F;
-  --ink-faint: #8A938C;
-  --rule: #D6DBD3;
-  --accent: #1F6F64;
-  --accent-soft: #E3EFEC;
-  --danger: #A8492E;
-  --danger-soft: #F5E7E1;
-  --code-bg: #EDEFEA;
+  --panel: #DAE1DE;
+  --ink: #182422;
+  --ink-soft: #576863;
+  --ink-faint: #8A9993;
+  --rule: #CAD3CF;
+  --accent: #C2571E;
+  --accent-soft: #F3DFCF;
+  --danger: #B33A3A;
+  --danger-soft: #F5DEDA;
+  --code-bg: #DEE5E1;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14181A;
-    --surface: #1B2123;
-    --panel: #212928;
-    --ink: #E7ECE8;
-    --ink-soft: #9CA8A0;
-    --ink-faint: #6E7A73;
-    --rule: #2C3634;
-    --accent: #56AE9E;
-    --accent-soft: #1E2F2C;
-    --danger: #E38B6E;
-    --danger-soft: #34211B;
-    --code-bg: #1F2725;
+  :root:not([data-theme="light"]) {
+    --bg: #131614;
+    --surface: #1A1F1C;
+    --panel: #212823;
+    --ink: #E9ECE9;
+    --ink-soft: #9AA69F;
+    --ink-faint: #647069;
+    --rule: #2B332E;
+    --accent: #E08148;
+    --accent-soft: #3A2A1E;
+    --danger: #E08072;
+    --danger-soft: #3A211C;
+    --code-bg: #1C211E;
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: #131614;
+  --surface: #1A1F1C;
+  --panel: #212823;
+  --ink: #E9ECE9;
+  --ink-soft: #9AA69F;
+  --ink-faint: #647069;
+  --rule: #2B332E;
+  --accent: #E08148;
+  --accent-soft: #3A2A1E;
+  --danger: #E08072;
+  --danger-soft: #3A211C;
+  --code-bg: #1C211E;
 }
 
 * { box-sizing: border-box; }
@@ -35,7 +50,7 @@
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Public Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 48px 20px 96px;
@@ -44,7 +59,7 @@ body {
 header.masthead, main, footer { max-width: 720px; margin: 0 auto; }
 
 .eyebrow {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -53,8 +68,9 @@ header.masthead, main, footer { max-width: 720px; margin: 0 auto; }
 }
 
 h1 {
-  font-family: "IBM Plex Serif", Georgia, serif;
-  font-weight: 600;
+  font-family: "Archivo", -apple-system, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.015em;
   font-size: clamp(26px, 4vw, 34px);
   margin: 0 0 12px;
   text-wrap: balance;
@@ -109,7 +125,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--ink-faint);
 }
@@ -125,15 +141,16 @@ h1 {
 }
 
 .step-num {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   color: var(--ink-faint);
   padding-top: 4px;
 }
 
 .step h2 {
-  font-family: "IBM Plex Serif", Georgia, serif;
-  font-weight: 600;
+  font-family: "Archivo", -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   font-size: 19px;
   margin: 0 0 10px;
 }
@@ -143,7 +160,7 @@ h1 {
   background: var(--code-bg);
   padding: 1px 5px;
   border-radius: 4px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9em;
 }
 
@@ -228,7 +245,7 @@ input[type="text"] {
 
 textarea#paste-area {
   width: 100%;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 13px;
   border: 1px solid var(--rule);
   border-radius: 6px;
@@ -264,7 +281,7 @@ textarea#paste-area {
   padding: 10px 12px;
   background: var(--code-bg);
   border-radius: 6px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   line-height: 1.6;
   color: var(--ink);
@@ -275,7 +292,7 @@ textarea#paste-area {
 .unrecognized-item textarea {
   width: 100%;
   min-height: 120px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   border: 1px solid var(--rule);
   border-radius: 6px;
@@ -342,7 +359,7 @@ textarea#paste-area {
   margin-bottom: 4px;
 }
 .question-item .q-code {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11.5px;
   color: var(--accent);
   text-transform: uppercase;
@@ -358,7 +375,7 @@ textarea#paste-area {
 .q-weight-input {
   width: 52px;
   font-size: 12px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   border: 1px solid var(--rule);
   border-radius: 4px;
   padding: 2px 4px;
@@ -387,7 +404,7 @@ textarea#paste-area {
 .q-option-row input[type="checkbox"],
 .q-option-row input[type="radio"] { margin: 0; }
 .q-option-row .q-option-letter {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--ink-faint);
   width: 14px;
@@ -419,7 +436,7 @@ textarea#paste-area {
 }
 .field-item .field-label { flex: 1; }
 .field-item .field-tag {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--ink-faint);
 }
@@ -461,7 +478,7 @@ select#new-field-position {
 .preview-row:last-child { border-bottom: none; }
 .preview-row.is-field { background: var(--accent-soft); }
 .preview-row .p-index {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 11px;
   color: var(--ink-faint);
   width: 20px;
@@ -470,7 +487,7 @@ select#new-field-position {
 }
 .preview-row .p-body { flex: 1; min-width: 0; }
 .preview-row .p-tag {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 10.5px;
   text-transform: uppercase;
   color: var(--accent);
@@ -571,6 +588,6 @@ footer a { color: var(--ink-faint); }
   background: var(--code-bg);
   padding: 1px 5px;
   border-radius: 4px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.9em;
 }
