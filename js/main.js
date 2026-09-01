@@ -14,7 +14,6 @@ const el = (id) => document.getElementById(id);
 const fileInput = el("file-input");
 const dropzone = el("dropzone");
 const pasteBox = el("paste-box");
-const pasteToggleBtn = el("btn-paste-toggle");
 const pasteArea = el("paste-area");
 const parseBtn = el("btn-parse");
 const templateBtn = el("btn-template");
@@ -151,25 +150,25 @@ templateMdBtn.addEventListener("click", () => {
   downloadBlob("gabarit_questions.md", sample, "text/markdown;charset=utf-8");
 });
 
-pasteToggleBtn.addEventListener("click", () => {
+function togglePasteArea() {
   pasteArea.classList.toggle("hidden");
   parseBtn.classList.toggle("hidden");
-});
+}
 
-// Make the whole card clickable, not just the button inside it — but let
-// a direct click on the button itself go through its own handler above
-// rather than firing this too (which would immediately toggle back).
-pasteBox.addEventListener("click", (e) => {
-  if (e.target === pasteToggleBtn) return;
-  pasteToggleBtn.click();
-});
-
-// Same for the dropzone: click anywhere to open the file picker, except
-// on the file input itself (it already opens its own picker natively).
-dropzone.addEventListener("click", (e) => {
-  if (e.target === fileInput) return;
-  fileInput.click();
-});
+// Both cards are the whole clickable control now (no inner button to
+// mediate the click) — file-input stays in the DOM but visually hidden,
+// triggered via .click(), so the native picker still opens.
+function onActivate(handler) {
+  return (e) => {
+    if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") return;
+    if (e.type === "keydown") e.preventDefault();
+    handler();
+  };
+}
+pasteBox.addEventListener("click", onActivate(togglePasteArea));
+pasteBox.addEventListener("keydown", onActivate(togglePasteArea));
+dropzone.addEventListener("click", onActivate(() => fileInput.click()));
+dropzone.addEventListener("keydown", onActivate(() => fileInput.click()));
 
 fileInput.addEventListener("change", async () => {
   const files = Array.from(fileInput.files || []);

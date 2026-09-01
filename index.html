@@ -63,12 +63,13 @@
         <p>Pour restructurer un document complexe, <a href="https://github.com/bertrandformet/mdfusion" target="_blank" rel="noopener">mdfusion</a>, notamment son éditeur, peut aider.</p>
       </details>
       <div class="import-options">
-        <div class="dropzone" id="dropzone">
-          <input type="file" id="file-input" accept=".csv,.tsv,.txt,.md,.markdown,.pdf,.docx,.doc,.xlsx,.xls,.html,.htm" multiple>
-          <p class="dropzone-hint">ou glissez-déposez vos fichiers ici</p>
+        <div class="dropzone" id="dropzone" role="button" tabindex="0">
+          <input type="file" id="file-input" class="visually-hidden" accept=".csv,.tsv,.txt,.md,.markdown,.pdf,.docx,.doc,.xlsx,.xls,.html,.htm" multiple tabindex="-1">
+          <p class="dropzone-label">Choisir des fichiers</p>
+          <p class="dropzone-hint">ou glissez-déposez-les ici</p>
         </div>
-        <div class="paste-box" id="paste-box">
-          <button type="button" id="btn-paste-toggle" class="secondary-btn">Coller du texte</button>
+        <div class="paste-box" id="paste-box" role="button" tabindex="0">
+          <p class="paste-label">Coller du texte</p>
           <p class="paste-hint">CSV/TSV, ou un texte de questions au format Markdown</p>
         </div>
       </div>
