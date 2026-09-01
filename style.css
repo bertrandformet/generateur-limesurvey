@@ -389,11 +389,22 @@ textarea#paste-area {
 
 .unrecognized-box { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .unrecognized-partial-ok {
+  position: relative;
   font-size: 13px;
   color: var(--accent);
   background: var(--accent-soft);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 28px;
+}
+.unrecognized-partial-ok::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
 }
 .unrecognized-item {
   border: 1px solid var(--rule);
@@ -441,15 +452,40 @@ textarea#paste-area {
   font-size: 12.5px;
   color: var(--danger);
 }
+.unrecognized-status:not(:empty) {
+  position: relative;
+  padding-left: 13px;
+}
+.unrecognized-status:not(:empty)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--danger);
+}
 
 .warnings { margin-top: 12px; }
 .warnings .warn-item {
+  position: relative;
   font-size: 13px;
   color: var(--danger);
   background: var(--danger-soft);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 6px 10px 6px 26px;
   margin-bottom: 6px;
+}
+.warnings .warn-item::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  background: var(--danger);
 }
 
 .select-toolbar { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
@@ -734,19 +770,41 @@ select#new-field-position {
 
 .lint-report { margin-bottom: 14px; }
 .lint-report .lint-ok {
+  position: relative;
   font-size: 13px;
   color: var(--accent);
   background: var(--accent-soft);
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 28px;
+}
+.lint-report .lint-ok::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
 }
 .lint-report .lint-err {
+  position: relative;
   font-size: 13px;
   color: var(--danger);
   background: var(--danger-soft);
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 6px 10px 6px 26px;
   margin-bottom: 6px;
+}
+.lint-report .lint-err::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7px;
+  height: 7px;
+  background: var(--danger);
 }
 
 footer {
