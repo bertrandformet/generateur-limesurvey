@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur de questionnaire LimeSurvey</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <p class="eyebrow">Outil — questionnaire LimeSurvey</p>
+  <h1>Générateur de questionnaire</h1>
+  <p class="dek">Importez une banque de questions, sélectionnez celles qui vous intéressent, ajoutez des champs (nom, prénom...), et téléchargez un fichier prêt à importer dans LimeSurvey.</p>
+</header>
+
+<main>
+
+  <section class="step" id="step-import">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <h2>Importer les questions</h2>
+      <p class="hint">Un ou plusieurs fichiers PDF, Word, Markdown, Excel ou CSV — les questions de chaque fichier s'ajoutent aux précédentes, et un corrigé séparé (avec les mêmes numéros de question) complète automatiquement les bonnes réponses.
+        <button type="button" id="btn-template" class="link-btn">Télécharger un gabarit CSV</button>
+      </p>
+      <div class="import-row">
+        <input type="file" id="file-input" accept=".csv,.tsv,.txt,.md,.markdown,.pdf,.docx,.doc,.xlsx,.xls,.html,.htm" multiple>
+        <span class="or">ou</span>
+        <button type="button" id="btn-paste-toggle" class="secondary-btn">Coller du texte</button>
+      </div>
+      <textarea id="paste-area" class="hidden" rows="8" placeholder="Collez ici du texte — CSV/TSV, ou un texte de questions au format Markdown"></textarea>
+      <button type="button" id="btn-parse" class="hidden">Analyser ce texte</button>
+      <div id="import-warnings" class="warnings"></div>
+      <div id="unrecognized-box" class="unrecognized-box hidden"></div>
+    </div>
+  </section>
+
+  <section class="step" id="step-select" style="display:none">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h2>Sélectionner et modifier les questions</h2>
+      <p class="hint">Le texte de la question et de chaque option est modifiable directement ; cochez la case en face d'une option pour changer la ou les bonnes réponses.</p>
+      <div class="select-toolbar">
+        <button type="button" id="btn-select-all" class="link-btn">Tout sélectionner</button>
+        <button type="button" id="btn-select-none" class="link-btn">Tout désélectionner</button>
+        <span id="select-count" class="count"></span>
+      </div>
+      <div id="question-list" class="question-list"></div>
+    </div>
+  </section>
+
+  <section class="step" id="step-fields" style="display:none">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h2>Champs additionnels</h2>
+      <p class="hint">Des champs à insérer où vous voulez dans le questionnaire (ex. nom, prénom, établissement) — au début, à la fin, ou juste après une question précise.</p>
+      <div id="fields-list" class="fields-list"></div>
+      <div class="add-field-row">
+        <input type="text" id="new-field-label" placeholder="Libellé du champ (ex. Prénom)">
+        <select id="new-field-position"></select>
+        <label class="checkbox-label"><input type="checkbox" id="new-field-mandatory"> Obligatoire</label>
+        <button type="button" id="btn-add-field" class="secondary-btn">Ajouter</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-preview" style="display:none">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h2>Aperçu</h2>
+      <p class="hint">Ordre exact dans lequel les éléments apparaîtront dans le questionnaire généré.</p>
+      <div id="preview-list" class="preview-list"></div>
+    </div>
+  </section>
+
+  <section class="step" id="step-generate" style="display:none">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <h2>Générer</h2>
+      <label class="title-label">Titre du questionnaire
+        <input type="text" id="quiz-title" value="Questionnaire">
+      </label>
+      <div id="generate-summary" class="summary"></div>
+      <div id="lint-report" class="lint-report"></div>
+      <button type="button" id="btn-generate" class="primary-btn">Générer le fichier .lss</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Génère un fichier .lss (structure d'enquête LimeSurvey) directement dans votre navigateur — rien n'est envoyé à un serveur.
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Test — cœur du générateur LSS</title>
+</head>
+<body>
+<h1>Test du cœur du générateur LSS</h1>
+<pre id="out" style="white-space: pre-wrap; font-family: monospace;"></pre>
+
+<script type="module">
+import { createState, buildListRadio, buildMultipleChoice, buildShortText, buildEquation, buildBoilerplate } from "../js/lss/builders.js";
+import { assembleDocument } from "../js/lss/assemble.js";
+import { validateDocument } from "../js/lss/validate.js";
+
+const out = document.getElementById("out");
+function log(msg) { out.textContent += msg + "\n"; }
+
+const SID = 999001;
+const state = createState(SID);
+
+const GID_INFOS = 1;
+const GID_QUESTIONS = 2;
+const GID_RESULTAT = 3;
+
+// Custom identity fields
+buildShortText(state, { gid: GID_INFOS, code: "NOM", text: "Nom", order: 1, mandatory: "Y" });
+buildShortText(state, { gid: GID_INFOS, code: "PRENOM", text: "Prénom", order: 2, mandatory: "N" });
+
+// Questions
+const q1 = buildListRadio(state, {
+  gid: GID_QUESTIONS, code: "Q1", text: "Quelle est la capitale de la France ?",
+  options: [{ code: "A", text: "Lyon" }, { code: "B", text: "Paris" }, { code: "C", text: "Marseille" }],
+  correctCode: "B", order: 1,
+});
+
+const q2 = buildMultipleChoice(state, {
+  gid: GID_QUESTIONS, code: "Q2", text: "Cochez les nombres pairs — avec un lien <a href='https://example.org' target='_blank'>test</a> et une apostrophe d'essai.",
+  options: [{ code: "A", text: "2" }, { code: "B", text: "3" }, { code: "C", text: "4" }, { code: "D", text: "5" }],
+  correctCodes: ["A", "C"], order: 2,
+});
+
+const formula = `${q1.formula} + ${q2.formula}`;
+const eq = buildEquation(state, { gid: GID_QUESTIONS, code: "SCORE", formula, order: 3, hidden: true });
+
+const feedbackHtml =
+  `<p><strong>Votre résultat : {SCORE.NAOK}/2</strong></p>` +
+  `{if(SCORE.NAOK>=2, "<p>Bravo, score parfait.</p>", "<p>Il en manque une, ce n'est pas grave.</p>")}`;
+buildBoilerplate(state, { gid: GID_RESULTAT, code: "FB", html: feedbackHtml, order: 1 });
+
+const meta = {
+  title: "Fixture de test",
+  welcomeHtml: "<p>Bienvenue dans ce test.</p>",
+  endTextHtml: "<p>Merci.</p>",
+  groups: [
+    { gid: GID_INFOS, order: 1, grelevance: "1", name: "Informations", description: "" },
+    { gid: GID_QUESTIONS, order: 2, grelevance: "1", name: "Questions", description: "" },
+    { gid: GID_RESULTAT, order: 3, grelevance: "1", name: "Résultat", description: "" },
+  ],
+};
+
+const xml = assembleDocument(state, meta);
+const errors = validateDocument(state, xml);
+
+log("=== Lint (validateDocument) ===");
+if (errors.length === 0) {
+  log("OK — aucune erreur détectée.");
+} else {
+  errors.forEach((e) => log("ERREUR: " + e));
+}
+
+log("\n=== Compteurs ===");
+log("questions: " + state.rowsQuestions.length);
+log("subquestions: " + state.rowsSubquestions.length);
+log("question_l10ns: " + state.rowsQuestionL10ns.length);
+log("answers: " + state.rowsAnswers.length);
+log("question_attributes: " + state.rowsQuestionAttributes.length);
+
+log("\n=== XML bien formé (DOMParser) ===");
+const doc = new DOMParser().parseFromString(xml, "application/xml");
+log(doc.querySelector("parsererror") ? "ERREUR DE PARSING" : "OK");
+
+log("\n=== Extrait: bloc subquestions ===");
+const m = xml.match(/<subquestions>[\s\S]*?<\/subquestions>/);
+log(m ? m[0].slice(0, 600) + "..." : "INTROUVABLE");
+
+log("\n=== Extrait: formule Q2 (doit contenir Q2_A.NAOK etc.) ===");
+const m2 = xml.match(/<question>\s*<!\[CDATA\[\{if\(Q2_A[\s\S]{0,300}/);
+log(m2 ? m2[0] : "INTROUVABLE");
+
+log("\n=== Extrait: bloc feedback (pas de \\\" ni <p><p>) ===");
+const m3 = xml.match(/Votre résultat[\s\S]{0,400}/);
+log(m3 ? m3[0] : "INTROUVABLE");
+
+window.__TEST_XML__ = xml;
+window.__TEST_ERRORS__ = errors;
+console.log("TEST_DONE", { errorCount: errors.length, errors });
+</script>
+</body>
+</html>
