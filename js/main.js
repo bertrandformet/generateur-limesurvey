@@ -290,6 +290,33 @@ function renderUnrecognized() {
     return;
   }
   unrecognizedBox.classList.remove("hidden");
+
+  // Shown once for the whole panel, not repeated per file.
+  const hint = document.createElement("div");
+  hint.className = "hint unrecognized-shared-hint";
+  hint.innerHTML =
+    "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée — un PDF ou Word " +
+    "n'a en général plus ni titres ni gras une fois le texte récupéré, tout est à plat. Exemple, tel " +
+    "qu'il arrive souvent depuis un PDF :" +
+    "<pre class=\"example-block\">Quelle est la capitale de la France ? A Lyon B Paris C Marseille</pre>" +
+    "Il faut le réécrire ainsi :" +
+    "<pre class=\"example-block\">## Question 1 — Capitale de la France\n" +
+    "**Quelle est la capitale de la France ?**\n" +
+    "- [ ] **A.** Lyon\n" +
+    "- [ ] **B.** Paris\n" +
+    "- [ ] **C.** Marseille</pre>" +
+    "<strong>Si vos questions et leur corrigé viennent de deux documents séparés</strong> (chacun affiché " +
+    "dans son propre panneau ci-dessous), pas besoin de fusionner leurs textes : réécrivez chacun dans son " +
+    "propre format, en validant chacun séparément — le rapprochement entre une question et sa bonne " +
+    "réponse se fait ensuite automatiquement par numéro. Le corrigé se réécrit ainsi (le nom de l'option " +
+    "suffit, pas besoin de répéter les 4 options) :" +
+    "<pre class=\"example-block\">## Question 1 — Réponses A et C\n" +
+    "- **A — Correct.** ...\n" +
+    "- **B — Incorrect.** ...</pre>" +
+    "Une fois validé, chaque texte reconstruit rejoint automatiquement la liste des questions à " +
+    "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé.";
+  unrecognizedBox.appendChild(hint);
+
   list.forEach((item) => {
     const box = document.createElement("div");
     box.className = "unrecognized-item";
@@ -297,30 +324,6 @@ function renderUnrecognized() {
     const title = document.createElement("div");
     title.className = "u-title";
     title.textContent = `${item.label} — structure non reconnue automatiquement`;
-
-    const hint = document.createElement("div");
-    hint.className = "hint";
-    hint.innerHTML =
-      "Le texte a bien été extrait, mais aucune question/réponse n'y a été détectée — un PDF ou Word " +
-      "n'a en général plus ni titres ni gras une fois le texte récupéré, tout est à plat. Exemple, tel " +
-      "qu'il arrive souvent depuis un PDF :" +
-      "<pre class=\"example-block\">Quelle est la capitale de la France ? A Lyon B Paris C Marseille</pre>" +
-      "Il faut le réécrire ainsi :" +
-      "<pre class=\"example-block\">## Question 1 — Capitale de la France\n" +
-      "**Quelle est la capitale de la France ?**\n" +
-      "- [ ] **A.** Lyon\n" +
-      "- [ ] **B.** Paris\n" +
-      "- [ ] **C.** Marseille</pre>" +
-      "<strong>Si vos questions et leur corrigé viennent de deux documents séparés</strong>, pas besoin " +
-      "de fusionner leurs textes : réécrivez chacun dans son propre format ci-dessous (un onglet ou un " +
-      "panneau par document), en validant chacun séparément — le rapprochement entre une question et sa " +
-      "bonne réponse se fait ensuite automatiquement par numéro. Le corrigé se réécrit ainsi (le nom de " +
-      "l'option suffit, pas besoin de répéter les 4 options) :" +
-      "<pre class=\"example-block\">## Question 1 — Réponses A et C\n" +
-      "- **A — Correct.** ...\n" +
-      "- **B — Incorrect.** ...</pre>" +
-      "Une fois validé, chaque texte reconstruit rejoint automatiquement la liste des questions à " +
-      "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé.";
 
     const ta = document.createElement("textarea");
     ta.value = item.text;
@@ -347,7 +350,6 @@ function renderUnrecognized() {
     actionRow.appendChild(status);
 
     box.appendChild(title);
-    box.appendChild(hint);
     box.appendChild(ta);
     box.appendChild(actionRow);
     unrecognizedBox.appendChild(box);
