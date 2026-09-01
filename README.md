@@ -50,10 +50,33 @@ Q3;T;Autres remarques (réponse libre, non notée);;;;;;
   défaut ; sans effet pour `T`)
 - jusqu'à 6 options (`option_a`..`option_f`)
 
+## Format d'import (Markdown)
+
 Un fichier Word, PDF ou Markdown peut aussi être importé directement : s'il
-suit une mise en page reconnaissable (titres de question, cases à cocher),
-les questions sont détectées automatiquement ; sinon, le texte est extrait
-et affiché pour un ajustement manuel avant réimport.
+suit une mise en page reconnaissable, les questions sont détectées
+automatiquement ; sinon, le texte est extrait et affiché pour un ajustement
+manuel avant réimport (un gabarit est aussi téléchargeable depuis l'outil).
+
+```
+## Question 1 — Capitale de la France
+**Quelle est la capitale de la France ?**
+- [ ] **A.** Lyon
+- [ ] **B.** Paris
+- [ ] **C.** Marseille
+
+## Question 1 — Réponse B
+```
+
+La bonne réponse se répète simplement sous le même numéro de question, dans
+le même texte ou dans un document séparé (le corrigé) importé à part : le
+rapprochement se fait ensuite automatiquement par numéro. Pour une question
+sans bonne réponse (réponse libre, non notée), les options sont remplacées
+par `[texte libre]`.
+
+Un questionnaire d'auto-positionnement (échelle de maîtrise, sans bonne
+réponse) issu de Word est également reconnu tel quel, sans numéro de
+question ni lettrage : une question en gras suivie de ses choix précédés
+de `☐`.
 
 ## Confidentialité
 
