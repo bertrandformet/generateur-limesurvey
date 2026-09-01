@@ -31,6 +31,15 @@ export function normalizeRows(rows) {
       warnings.push(`Ligne ${rowNum} : ignorée (code ou texte manquant).`);
       return;
     }
+    // A question's code becomes an Expression Manager variable name
+    // (js/lss/builders.js embeds it directly in formulas like
+    // `if(${code}.NAOK=="B",1,0)`) — anything outside this character set
+    // (a space, a quote, an EM operator...) would silently corrupt that
+    // formula with no error until the survey is actually taken.
+    if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(code)) {
+      warnings.push(`Ligne ${rowNum} : code "${code}" invalide (attendu : lettre initiale, puis lettres/chiffres/_ uniquement) — ignorée.`);
+      return;
+    }
     if (seenCodes.has(code)) {
       warnings.push(`Ligne ${rowNum} : code "${code}" déjà utilisé — ignorée.`);
       return;

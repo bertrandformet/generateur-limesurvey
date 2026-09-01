@@ -71,6 +71,14 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
     const h = line.match(HEADING_RE);
     if (h) {
       const headingText = h[1].replace(/[—-]\s*$/, "").trim();
+      if (ANSWER_HEADING_RE.test(headingText)) {
+        // A corrigé heading ("Question 1 — Réponse B"), not a new
+        // question — flush whatever question was being built (it's
+        // complete) but don't start tracking this as one, and don't warn
+        // about it below: parseMarkdownAnswerKey is what reads these.
+        flush();
+        continue;
+      }
       const qm = headingText.match(QUESTION_NUM_RE);
       if (qm) {
         flush();
@@ -273,6 +281,12 @@ export function applyAnswerKey(questions, answerKey) {
     if (q) {
       const validCodes = new Set(q.options.map((o) => o.code));
       q.correct = answerKey[code].filter((c) => validCodes.has(c));
+      // parseMarkdownQuestions always guesses "M" (checkbox) at parse time,
+      // before the corrigé is known — now that we know exactly how many
+      // answers are correct, use a radio button (L) for the common
+      // single-answer case instead of showing checkboxes that invite
+      // picking more than one.
+      if (q.type !== "T") q.type = q.correct.length === 1 ? "L" : "M";
     } else {
       unmatched.push(code);
     }

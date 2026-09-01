@@ -12,10 +12,20 @@ export function buildSequence(questions, fields) {
   const endFields = fields.filter((f) => f.position.mode === "end");
   const afterFields = fields.filter((f) => f.position.mode === "after");
 
+  // Two fields both positioned "after Q1" must keep their creation order.
+  // Re-finding Q1's index on every iteration and always inserting right
+  // after it would instead reverse them (the second field lands between
+  // Q1 and the first) — afterOffsets tracks how many fields already
+  // landed after a given code so each new one goes after those, not
+  // between them and the question.
+  const afterOffsets = new Map();
   afterFields.forEach((f) => {
-    const idx = seq.findIndex((item) => item.kind === "question" && item.code === f.position.afterCode);
-    const insertAt = idx === -1 ? seq.length : idx + 1;
+    const afterCode = f.position.afterCode;
+    const idx = seq.findIndex((item) => item.kind === "question" && item.code === afterCode);
+    const offset = afterOffsets.get(afterCode) || 0;
+    const insertAt = idx === -1 ? seq.length : idx + 1 + offset;
     seq.splice(insertAt, 0, { kind: "field", ...f });
+    afterOffsets.set(afterCode, offset + 1);
   });
 
   return [

@@ -319,25 +319,22 @@ function processOneSource(src, allWarnings, pendingAnswerKeys) {
     }
   }
 
-  // Tried before the question parser: a "corrigé" document's headings
-  // ("### Question 1 — Réponses B et D") also look like the start of a
-  // question to parseMarkdownQuestions, which would otherwise report a
-  // confusing "no options found" warning for a source that in fact parsed
-  // fine as an answer key.
+  // parseMarkdownAnswerKey reads corrigé headings ("### Question 1 —
+  // Réponses B et D"); parseMarkdownQuestions now recognizes and skips
+  // those same headings itself (see its ANSWER_HEADING_RE check) instead
+  // of misreading them as a failed question, so both can run unconditionally
+  // without one's warnings needing to suppress the other's.
   const { answerKey, warnings: akWarnings } = parseMarkdownAnswerKey(src.text, label);
   if (Object.keys(answerKey).length > 0) {
     pendingAnswerKeys.push({ label, answerKey });
     matched = true;
   }
 
-  const isAnswerKeySource = Object.keys(answerKey).length > 0;
   const { questions: mdQuestions, warnings: mdWarnings } = parseMarkdownQuestions(src.text, label);
   if (mdQuestions.length > 0) {
     matched = appendQuestions(mdQuestions, label, allWarnings) || matched;
   }
-  if (!isAnswerKeySource) {
-    allWarnings.push(...mdWarnings.map((w) => `[${label}] ${w}`));
-  }
+  allWarnings.push(...mdWarnings.map((w) => `[${label}] ${w}`));
   allWarnings.push(...akWarnings.map((w) => `[${label}] ${w}`));
 
   // Self-assessment forms (Word "☐ option" lists, no "## Question N"
@@ -971,7 +968,12 @@ function renderPreview() {
 }
 
 function escapeHtml(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 // --- Generate -----------------------------------------------------------------
