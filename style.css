@@ -539,6 +539,23 @@ select#new-field-position {
 }
 .add-field-row { display: flex; align-items: center; gap: 10px; }
 .add-field-row input[type="text"] { flex: 1; }
+
+.add-field-image-block { display: flex; flex-direction: column; gap: 8px; }
+.add-field-image-block .or { color: var(--ink-faint); font-size: 13px; }
+#new-field-image-url {
+  width: 100%;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface);
+  color: var(--ink);
+}
+.image-size-hint { margin: 0; font-size: 12.5px; }
+
+.p-image-thumb { margin-top: 6px; }
+.p-image-thumb img { max-width: 160px; max-height: 100px; border-radius: 6px; border: 1px solid var(--rule); display: block; }
 .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
 
 .title-label { display: block; font-size: 13px; color: var(--ink-soft); margin-bottom: 16px; }

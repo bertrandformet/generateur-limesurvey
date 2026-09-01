@@ -73,16 +73,20 @@ const newFieldPosition = el("new-field-position");
 const newFieldMandatory = el("new-field-mandatory");
 const newFieldMandatoryWrap = el("new-field-mandatory-wrap");
 const addFieldBtn = el("btn-add-field");
+const newFieldImageBlock = el("new-field-image-block");
+const newFieldImageFile = el("new-field-image-file");
+const newFieldImageUrl = el("new-field-image-url");
 
 function currentFieldKind() {
   return Array.from(newFieldKindInputs).find((r) => r.checked)?.value || "field";
 }
 
 function updateAddFieldFormVisibility() {
-  const isText = currentFieldKind() === "text";
-  newFieldLabel.classList.toggle("hidden", isText);
-  newFieldText.classList.toggle("hidden", !isText);
-  newFieldMandatoryWrap.classList.toggle("hidden", isText);
+  const kind = currentFieldKind();
+  newFieldLabel.classList.toggle("hidden", kind !== "field");
+  newFieldText.classList.toggle("hidden", kind !== "text");
+  newFieldImageBlock.classList.toggle("hidden", kind !== "image");
+  newFieldMandatoryWrap.classList.toggle("hidden", kind !== "field");
 }
 newFieldKindInputs.forEach((r) => r.addEventListener("change", updateAddFieldFormVisibility));
 updateAddFieldFormVisibility();
@@ -657,23 +661,58 @@ function positionLabel(position) {
   return `Après ${position.afterCode}`;
 }
 
-addFieldBtn.addEventListener("click", () => {
-  const kind = currentFieldKind();
-  const content = kind === "text" ? newFieldText.value.trim() : newFieldLabel.value.trim();
-  if (!content) return;
+function pushField(field) {
   state.customFields.push({
-    code: makeFieldCode(kind === "text" ? "texte" : content),
-    kind,
-    label: content,
-    mandatory: kind === "field" && newFieldMandatory.checked,
+    mandatory: false,
+    ...field,
     position: positionFromSelectValue(newFieldPosition.value),
   });
   newFieldLabel.value = "";
   newFieldText.value = "";
+  newFieldImageUrl.value = "";
+  newFieldImageFile.value = "";
   newFieldMandatory.checked = false;
   renderFieldsList();
   renderPreview();
   renderSummary();
+}
+
+addFieldBtn.addEventListener("click", () => {
+  const kind = currentFieldKind();
+
+  if (kind === "image") {
+    const file = newFieldImageFile.files[0];
+    const url = newFieldImageUrl.value.trim();
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        pushField({
+          code: makeFieldCode("image"),
+          kind: "image",
+          label: `<img src="${reader.result}" alt="" style="max-width:100%;height:auto;">`,
+          displayName: file.name,
+        });
+      };
+      reader.readAsDataURL(file);
+    } else if (url) {
+      pushField({
+        code: makeFieldCode("image"),
+        kind: "image",
+        label: `<img src="${escapeHtml(url)}" alt="" style="max-width:100%;height:auto;">`,
+        displayName: url,
+      });
+    }
+    return;
+  }
+
+  const content = kind === "text" ? newFieldText.value.trim() : newFieldLabel.value.trim();
+  if (!content) return;
+  pushField({
+    code: makeFieldCode(kind === "text" ? "texte" : content),
+    kind,
+    label: content,
+    mandatory: kind === "field" && newFieldMandatory.checked,
+  });
 });
 
 function renderFieldsList() {
@@ -684,8 +723,9 @@ function renderFieldsList() {
 
     const label = document.createElement("span");
     label.className = "field-label";
-    const kindPrefix = f.kind === "text" ? "[texte] " : "";
-    const shortLabel = f.label.length > 60 ? f.label.slice(0, 60) + "…" : f.label;
+    const kindPrefix = f.kind === "text" ? "[texte] " : f.kind === "image" ? "[image] " : "";
+    const displayText = f.kind === "image" ? f.displayName || "image" : f.label;
+    const shortLabel = displayText.length > 60 ? displayText.slice(0, 60) + "…" : displayText;
     label.textContent = kindPrefix + shortLabel + (f.mandatory ? " *" : "");
 
     const posTag = document.createElement("span");
@@ -730,7 +770,7 @@ function renderPreview() {
 
   sequence.forEach((item, i) => {
     const row = document.createElement("div");
-    row.className = "preview-row" + (item.kind === "field" || item.kind === "text" ? " is-field" : "");
+    row.className = "preview-row" + (item.kind === "field" || item.kind === "text" || item.kind === "image" ? " is-field" : "");
 
     const index = document.createElement("div");
     index.className = "p-index";
@@ -751,6 +791,16 @@ function renderPreview() {
       tag.textContent = "texte";
       body.appendChild(tag);
       body.appendChild(document.createTextNode(item.label));
+    } else if (item.kind === "image") {
+      const tag = document.createElement("span");
+      tag.className = "p-tag";
+      tag.textContent = "image";
+      body.appendChild(tag);
+      body.appendChild(document.createTextNode(item.displayName || ""));
+      const thumb = document.createElement("div");
+      thumb.className = "p-image-thumb";
+      thumb.innerHTML = item.label;
+      body.appendChild(thumb);
     } else if (item.type === "T") {
       const tag = document.createElement("span");
       tag.className = "p-tag";

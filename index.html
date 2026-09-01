@@ -96,15 +96,22 @@
     <div class="step-num">3</div>
     <div class="step-body">
       <h2>Champs additionnels</h2>
-      <p class="hint">Des champs à remplir (nom, prénom, établissement...) ou du texte d'information sans saisie (consigne, rappel...) — à insérer où vous voulez : au début, à la fin, ou juste après une question précise.</p>
+      <p class="hint">Des champs à remplir (nom, prénom, établissement...), du texte d'information sans saisie (consigne, rappel...) ou une image (logo, illustration) — à insérer où vous voulez : au début, à la fin, ou juste après une question précise.</p>
       <div id="fields-list" class="fields-list"></div>
       <div class="add-field-form">
         <div class="add-field-kind">
           <label class="radio-label"><input type="radio" name="new-field-kind" value="field" checked> Champ à remplir</label>
           <label class="radio-label"><input type="radio" name="new-field-kind" value="text"> Texte d'information (pas de saisie)</label>
+          <label class="radio-label"><input type="radio" name="new-field-kind" value="image"> Image</label>
         </div>
         <input type="text" id="new-field-label" placeholder="Libellé du champ (ex. Prénom)">
         <textarea id="new-field-text" class="hidden" rows="3" placeholder="Texte à afficher (peut contenir du HTML simple, ex. <strong>...</strong>)"></textarea>
+        <div id="new-field-image-block" class="hidden add-field-image-block">
+          <input type="file" id="new-field-image-file" accept="image/*">
+          <span class="or">ou</span>
+          <input type="text" id="new-field-image-url" placeholder="URL d'une image (https://...)">
+          <p class="hint image-size-hint">Un fichier importé est encodé directement dans le .lss : préférez une image légère (quelques centaines de Ko) ou une URL pour un fichier plus lourd.</p>
+        </div>
         <div class="add-field-row">
           <select id="new-field-position"></select>
           <label class="checkbox-label" id="new-field-mandatory-wrap"><input type="checkbox" id="new-field-mandatory"> Obligatoire</label>

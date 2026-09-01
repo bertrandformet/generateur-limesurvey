@@ -49,7 +49,7 @@ export function buildFlatQuiz({ sid, title, customFields, questions }) {
       continue;
     }
 
-    if (item.kind === "text") {
+    if (item.kind === "text" || item.kind === "image") {
       buildBoilerplate(state, { gid: GID_QUESTIONS, code: item.code, html: item.label, order: order++ });
       continue;
     }
