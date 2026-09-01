@@ -291,6 +291,15 @@ function renderUnrecognized() {
   }
   unrecognizedBox.classList.remove("hidden");
 
+  if (state.importedQuestions.length > 0) {
+    const ok = document.createElement("div");
+    ok.className = "unrecognized-partial-ok";
+    ok.textContent =
+      `${state.importedQuestions.length} question(s) déjà importée(s) avec succès depuis les autres ` +
+      `documents — seuls ceux ci-dessous n'ont pas été reconnus :`;
+    unrecognizedBox.appendChild(ok);
+  }
+
   // Shown once for the whole panel, not repeated per file.
   const hint = document.createElement("div");
   hint.className = "hint unrecognized-shared-hint";
