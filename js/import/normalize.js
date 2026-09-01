@@ -1,6 +1,6 @@
 // Converts parsed tabular rows into the canonical question shape used
 // throughout the app:
-//   { code, type: "L"|"M", text, options: [{code,text}], correct: [codes], weight }
+//   { code, type: "L"|"M"|"T", text, options: [{code,text}], correct: [codes], weight }
 //
 // Expected columns (header row, case-insensitive, any of , ; \t as
 // delimiter — see parse-tabular.js): code, type, texte, option_a..option_f,
@@ -8,6 +8,10 @@
 // "correct" holds one or more option letters separated by ; , or
 // whitespace (comma is also accepted here even though it's a common column
 // delimiter, since parse-tabular.js has already split columns by then).
+//
+// Type "T" is an open answer field (no options, not scored) — for things
+// like "autres attentes, à préciser" on a self-assessment form. It only
+// needs code/texte; option_* / correct / coefficient columns are ignored.
 
 const OPTION_COLUMNS = ["option_a", "option_b", "option_c", "option_d", "option_e", "option_f"];
 const OPTION_LETTERS = ["A", "B", "C", "D", "E", "F"];
@@ -31,8 +35,14 @@ export function normalizeRows(rows) {
       warnings.push(`Ligne ${rowNum} : code "${code}" déjà utilisé — ignorée.`);
       return;
     }
-    if (type !== "L" && type !== "M") {
-      warnings.push(`Ligne ${rowNum} ("${code}") : type "${type}" non reconnu (attendu L ou M) — ignorée.`);
+    if (type !== "L" && type !== "M" && type !== "T") {
+      warnings.push(`Ligne ${rowNum} ("${code}") : type "${type}" non reconnu (attendu L, M ou T) — ignorée.`);
+      return;
+    }
+
+    if (type === "T") {
+      seenCodes.add(code);
+      questions.push({ code, type, text, options: [], correct: [], weight: 1 });
       return;
     }
 

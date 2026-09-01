@@ -36,9 +36,13 @@ function detectLevelPrefix(headingText) {
 const HEADING_RE = /^#{1,6}\s+(.*)$/;
 const QUESTION_NUM_RE = /Question\s+(\d+)/i;
 const OPTION_RE = /^[-*]\s*\[[ xX]?\]\s*\*\*([A-Za-z])[.)]?\*\*\.?\s*(.+)$/;
+// Marks a question as an open, unscored answer field (e.g. "autres attentes,
+// à préciser" on a self-assessment form) instead of a checkbox question —
+// see js/lss/builders.js buildShortText, already used for custom fields.
+const OPEN_TEXT_RE = /^\[(texte|r[ée]ponse)\s+libre\]$/i;
 
 /**
- * @returns {{ questions: {code:string,type:"M",text:string,options:{code:string,text:string}[],correct:string[]}[], warnings: string[] }}
+ * @returns {{ questions: {code:string,type:"M"|"T",text:string,options:{code:string,text:string}[],correct:string[]}[], warnings: string[] }}
  */
 export function parseMarkdownQuestions(mdText, sourceLabel) {
   const lines = mdText.split(/\r?\n/);
@@ -49,8 +53,10 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
 
   function flush() {
     if (!current) return;
-    if (current.text && current.options.length >= 2) {
-      const code = (levelPrefix || "Q") + current.num;
+    const code = (levelPrefix || "Q") + current.num;
+    if (current.text && current.openText) {
+      questions.push({ code, type: "T", text: current.text, options: [], correct: [], weight: 1 });
+    } else if (current.text && current.options.length >= 2) {
       questions.push({ code, type: "M", text: current.text, options: current.options, correct: [], weight: 1 });
     } else {
       warnings.push(`${sourceLabel} : question ${current.num} — structure non reconnue, ignorée.`);
@@ -68,7 +74,7 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
       const qm = headingText.match(QUESTION_NUM_RE);
       if (qm) {
         flush();
-        current = { num: qm[1], text: "", options: [] };
+        current = { num: qm[1], text: "", options: [], openText: false };
       } else {
         const prefix = detectLevelPrefix(headingText);
         if (prefix) {
@@ -80,6 +86,11 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
     }
 
     if (!current) continue;
+
+    if (OPEN_TEXT_RE.test(line)) {
+      current.openText = true;
+      continue;
+    }
 
     const opt = line.match(OPTION_RE);
     if (opt) {

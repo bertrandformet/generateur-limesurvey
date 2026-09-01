@@ -38,14 +38,16 @@ directement depuis l'outil) :
 code;type;texte;option_a;option_b;option_c;option_d;correct;coefficient
 Q1;L;Quelle est la capitale de la France ?;Lyon;Paris;Marseille;;B;1
 Q2;M;Cochez les nombres pairs;2;3;4;5;"A,C";2
+Q3;T;Autres remarques (réponse libre, non notée);;;;;;
 ```
 
-- `type` : `L` (choix unique) ou `M` (cases à cocher, plusieurs bonnes
-  réponses possibles)
+- `type` : `L` (choix unique), `M` (cases à cocher, plusieurs bonnes
+  réponses possibles) ou `T` (réponse libre, non notée — les colonnes
+  d'options et `correct` sont alors ignorées)
 - `correct` : un code pour `L` ; plusieurs codes séparés par une virgule
   pour `M`
 - `coefficient` : nombre de points pour cette question (optionnel, 1 par
-  défaut)
+  défaut ; sans effet pour `T`)
 - jusqu'à 6 options (`option_a`..`option_f`)
 
 Un fichier Word, PDF ou Markdown peut aussi être importé directement : s'il

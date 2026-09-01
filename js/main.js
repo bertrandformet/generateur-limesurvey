@@ -92,7 +92,8 @@ templateBtn.addEventListener("click", () => {
   const sample =
     "code;type;texte;option_a;option_b;option_c;option_d;correct;coefficient\n" +
     "Q1;L;Quelle est la capitale de la France ?;Lyon;Paris;Marseille;;B;1\n" +
-    "Q2;M;Cochez les nombres pairs ;2;3;4;5;\"A,C\";2\n";
+    "Q2;M;Cochez les nombres pairs ;2;3;4;5;\"A,C\";2\n" +
+    "Q3;T;Autres remarques (réponse libre, non notée);;;;;;\n";
   downloadBlob("gabarit_questions.csv", sample, "text/csv;charset=utf-8");
 });
 
@@ -102,7 +103,11 @@ templateMdBtn.addEventListener("click", () => {
     "**Quelle est la capitale de la France ?**\n\n" +
     "- [ ] **A.** Lyon\n" +
     "- [ ] **B.** Paris\n" +
-    "- [ ] **C.** Marseille\n";
+    "- [ ] **C.** Marseille\n\n" +
+    "## Question 1 — Réponse B\n\n" +
+    "## Question 2 — Autres remarques\n\n" +
+    "**Autres remarques ?**\n\n" +
+    "[texte libre]\n";
   downloadBlob("gabarit_questions.md", sample, "text/markdown;charset=utf-8");
 });
 
@@ -445,27 +450,29 @@ function renderQuestionList() {
 
     const codeSpan = document.createElement("span");
     codeSpan.className = "q-code";
-    codeSpan.textContent = q.type === "L" ? "choix unique" : "cases à cocher";
-
-    const weightLabel = document.createElement("label");
-    weightLabel.className = "q-weight-label";
-    weightLabel.textContent = "Coefficient";
-    const weightInput = document.createElement("input");
-    weightInput.type = "number";
-    weightInput.className = "q-weight-input";
-    weightInput.min = "0.25";
-    weightInput.step = "0.25";
-    weightInput.value = q.weight;
-    weightInput.addEventListener("input", () => {
-      const v = Number(weightInput.value);
-      q.weight = v > 0 ? v : 1;
-      renderPreview();
-      renderSummary();
-    });
-    weightLabel.appendChild(weightInput);
+    codeSpan.textContent = q.type === "T" ? "réponse libre (non notée)" : q.type === "L" ? "choix unique" : "cases à cocher";
 
     codeRow.appendChild(codeSpan);
-    codeRow.appendChild(weightLabel);
+
+    if (q.type !== "T") {
+      const weightLabel = document.createElement("label");
+      weightLabel.className = "q-weight-label";
+      weightLabel.textContent = "Coefficient";
+      const weightInput = document.createElement("input");
+      weightInput.type = "number";
+      weightInput.className = "q-weight-input";
+      weightInput.min = "0.25";
+      weightInput.step = "0.25";
+      weightInput.value = q.weight;
+      weightInput.addEventListener("input", () => {
+        const v = Number(weightInput.value);
+        q.weight = v > 0 ? v : 1;
+        renderPreview();
+        renderSummary();
+      });
+      weightLabel.appendChild(weightInput);
+      codeRow.appendChild(weightLabel);
+    }
 
     const textInput = document.createElement("input");
     textInput.type = "text";
@@ -683,6 +690,12 @@ function renderPreview() {
       tag.textContent = "texte";
       body.appendChild(tag);
       body.appendChild(document.createTextNode(item.label));
+    } else if (item.type === "T") {
+      const tag = document.createElement("span");
+      tag.className = "p-tag";
+      tag.textContent = "réponse libre (non notée)";
+      body.appendChild(tag);
+      body.appendChild(document.createTextNode(item.text));
     } else {
       const tag = document.createElement("span");
       tag.className = "p-tag";
@@ -715,9 +728,11 @@ function renderSummary() {
   const selected = selectedQuestionsInOrder();
   const nQ = selected.length;
   const nF = state.customFields.length;
-  const totalPoints = selected.reduce((sum, q) => sum + (q.weight && q.weight > 0 ? q.weight : 1), 0);
+  const nOpen = selected.filter((q) => q.type === "T").length;
+  const totalPoints = selected.reduce((sum, q) => sum + (q.type === "T" ? 0 : q.weight && q.weight > 0 ? q.weight : 1), 0);
   const totalLabel = Number.isInteger(totalPoints) ? totalPoints : totalPoints.toFixed(2).replace(/\.?0+$/, "");
-  summaryBox.innerHTML = `<strong>${nQ}</strong> question(s) sélectionnée(s) (<strong>${totalLabel}</strong> point(s) au total), <strong>${nF}</strong> champ(s) additionnel(s).`;
+  const openLabel = nOpen > 0 ? `, dont <strong>${nOpen}</strong> en réponse libre (non notée)` : "";
+  summaryBox.innerHTML = `<strong>${nQ}</strong> question(s) sélectionnée(s) (<strong>${totalLabel}</strong> point(s) au total${openLabel}), <strong>${nF}</strong> champ(s) additionnel(s).`;
   lintBox.innerHTML = "";
 }
 

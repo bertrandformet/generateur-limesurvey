@@ -54,6 +54,11 @@ export function buildFlatQuiz({ sid, title, customFields, questions }) {
       continue;
     }
 
+    if (item.type === "T") {
+      buildShortText(state, { gid: GID_QUESTIONS, code: item.code, text: item.text, order: order++, mandatory: "N" });
+      continue;
+    }
+
     const weight = item.weight && item.weight > 0 ? item.weight : 1;
     totalPoints += weight;
 
