@@ -583,7 +583,13 @@ textarea#paste-area {
 .q-options { display: flex; flex-direction: column; gap: 4px; }
 .q-option-row { display: flex; align-items: flex-start; gap: 8px; }
 .q-option-row input[type="checkbox"],
-.q-option-row input[type="radio"] { margin: 3px 0 0; }
+.q-option-row input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  flex-shrink: 0;
+  cursor: pointer;
+}
 .q-option-row .q-option-letter {
   font-family: "JetBrains Mono", monospace;
   font-size: 11px;
