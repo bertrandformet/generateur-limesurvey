@@ -90,10 +90,11 @@
     </div>
   </section>
 
-  <section class="step" id="step-select" style="display:none">
+  <section class="step is-locked" id="step-select">
     <div class="step-num">2</div>
     <div class="step-body">
       <h2>Sélectionner et modifier les questions</h2>
+      <p class="step-locked-note">Importez des questions à l'étape 1 pour déverrouiller cette étape.</p>
       <p class="hint">Le texte de la question et de chaque option est modifiable directement ; cochez la case en face d'une option pour changer la ou les bonnes réponses. Utilisez la poignée <strong>⠿</strong> pour déplacer une question par glisser-déposer.</p>
       <div class="select-toolbar">
         <button type="button" id="btn-select-all" class="link-btn">Tout sélectionner</button>
@@ -108,10 +109,11 @@
     </div>
   </section>
 
-  <section class="step" id="step-fields" style="display:none">
+  <section class="step is-locked" id="step-fields">
     <div class="step-num">3</div>
     <div class="step-body">
       <h2>Champs additionnels</h2>
+      <p class="step-locked-note">Importez des questions à l'étape 1 pour déverrouiller cette étape.</p>
       <p class="hint">Des champs à remplir (nom, prénom, établissement...), du texte d'information sans saisie (consigne, rappel...) ou une image (logo, illustration) — à insérer où vous voulez : au début, à la fin, ou juste après une question précise.</p>
       <div id="fields-list" class="fields-list"></div>
       <div class="add-field-form">
@@ -145,10 +147,11 @@
     </div>
   </section>
 
-  <section class="step" id="step-preview" style="display:none">
+  <section class="step is-locked" id="step-preview">
     <div class="step-num">4</div>
     <div class="step-body">
       <h2>Aperçu</h2>
+      <p class="step-locked-note">Importez des questions à l'étape 1 pour déverrouiller cette étape.</p>
       <p class="hint">Ordre exact dans lequel les éléments apparaîtront dans le questionnaire généré.</p>
       <div id="preview-list" class="preview-list"></div>
       <div class="step-validate-row">
@@ -158,16 +161,18 @@
     </div>
   </section>
 
-  <section class="step" id="step-generate" style="display:none">
+  <section class="step is-locked" id="step-generate">
     <div class="step-num">5</div>
     <div class="step-body">
       <h2>Générer</h2>
+      <p class="step-locked-note">Importez des questions à l'étape 1 pour déverrouiller cette étape.</p>
       <label class="title-label">Titre du questionnaire
         <input type="text" id="quiz-title" value="Questionnaire">
       </label>
       <div id="generate-summary" class="summary"></div>
       <div id="lint-report" class="lint-report"></div>
       <button type="button" id="btn-generate" class="primary-btn">Générer le fichier .lss</button>
+      <div id="generate-confirmation" class="generate-confirmation hidden"></div>
 
       <div class="import-steps">
         <p class="import-steps-title">Ensuite, dans LimeSurvey :</p>

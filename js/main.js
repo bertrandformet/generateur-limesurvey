@@ -161,6 +161,7 @@ const quizTitleInput = el("quiz-title");
 const summaryBox = el("generate-summary");
 const lintBox = el("lint-report");
 const generateBtn = el("btn-generate");
+const generateConfirmation = el("generate-confirmation");
 
 // --- helpers ----------------------------------------------------------------
 
@@ -419,11 +420,14 @@ function finishImport(warnings) {
   renderAll();
 
   const has = state.importedQuestions.length > 0;
-  stepSelect.style.display = has ? "grid" : "none";
-  stepFields.style.display = has ? "grid" : "none";
-  stepPreview.style.display = has ? "grid" : "none";
-  stepGenerate.style.display = has ? "grid" : "none";
-  if (has) setProgress(1);
+  stepSelect.classList.toggle("is-locked", !has);
+  stepFields.classList.toggle("is-locked", !has);
+  stepPreview.classList.toggle("is-locked", !has);
+  stepGenerate.classList.toggle("is-locked", !has);
+  if (has) {
+    setProgress(1);
+    stepSelect.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 function renderWarnings() {
@@ -796,6 +800,7 @@ function pushField(field) {
   renderFieldsList();
   renderPreview();
   renderSummary();
+  fieldsList.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 addFieldBtn.addEventListener("click", () => {
@@ -992,9 +997,11 @@ function renderSummary() {
 }
 
 generateBtn.addEventListener("click", () => {
+  generateConfirmation.classList.add("hidden");
   const selectedQuestions = selectedQuestionsInOrder();
   if (selectedQuestions.length === 0) {
     lintBox.innerHTML = `<div class="lint-err">Sélectionnez au moins une question.</div>`;
+    lintBox.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
 
@@ -1014,6 +1021,7 @@ generateBtn.addEventListener("click", () => {
       div.textContent = e;
       lintBox.appendChild(div);
     });
+    lintBox.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
 
@@ -1025,6 +1033,10 @@ generateBtn.addEventListener("click", () => {
   const filename = title.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "questionnaire";
   downloadBlob(`${filename}.lss`, xml, "application/xml;charset=utf-8");
   setProgress(4);
+
+  generateConfirmation.textContent = `Fichier "${filename}.lss" généré et téléchargé.`;
+  generateConfirmation.classList.remove("hidden");
+  generateConfirmation.scrollIntoView({ behavior: "smooth", block: "center" });
 });
 
 setProgress(0);
