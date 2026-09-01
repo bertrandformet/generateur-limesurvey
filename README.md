@@ -53,6 +53,19 @@ suit une mise en page reconnaissable (titres de question, cases à cocher),
 les questions sont détectées automatiquement ; sinon, le texte est extrait
 et affiché pour un ajustement manuel avant réimport.
 
+## Confidentialité
+
+Tout se passe dans votre navigateur, rien n'est envoyé à un serveur. Vos
+fichiers, vos questions, vos modifications ne sont jamais transmis nulle
+part — l'outil ne dispose d'ailleurs d'aucun serveur à qui les envoyer.
+Rien n'est conservé non plus d'une visite à l'autre : fermer ou recharger
+la page efface tout ce qui a été importé ou saisi.
+
+Seule exception : au premier import d'un PDF, DOCX ou XLSX, le navigateur
+télécharge la bibliothèque nécessaire à sa lecture (ex. pdf.js) depuis un
+service de distribution de code public (esm.sh) — ce téléchargement ne
+contient que du code, jamais vos données.
+
 ## Licence
 
 [CC BY 4.0](LICENSE) — Bertrand Formet. Réutilisation et modification
