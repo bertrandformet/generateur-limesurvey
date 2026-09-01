@@ -10,7 +10,7 @@
 <body>
 
 <header class="masthead">
-  <p class="eyebrow">Outil — questionnaire LimeSurvey</p>
+  <p class="eyebrow">LimeSurvey</p>
   <h1>Générateur de questionnaire</h1>
   <p class="dek">Importez une banque de questions, sélectionnez celles qui vous intéressent, ajoutez des champs (nom, prénom...), et téléchargez un fichier prêt à importer dans LimeSurvey.</p>
 </header>
@@ -62,10 +62,13 @@
 ☐ Très bonne</pre>
         <p>Pour restructurer un document complexe, <a href="https://github.com/bertrandformet/mdfusion" target="_blank" rel="noopener">mdfusion</a>, notamment son éditeur, peut aider.</p>
       </details>
-      <div class="import-row">
-        <input type="file" id="file-input" accept=".csv,.tsv,.txt,.md,.markdown,.pdf,.docx,.doc,.xlsx,.xls,.html,.htm" multiple>
-        <span class="or">ou</span>
-        <button type="button" id="btn-paste-toggle" class="secondary-btn">Coller du texte</button>
+      <div class="dropzone" id="dropzone">
+        <div class="import-row">
+          <input type="file" id="file-input" accept=".csv,.tsv,.txt,.md,.markdown,.pdf,.docx,.doc,.xlsx,.xls,.html,.htm" multiple>
+          <span class="or">ou</span>
+          <button type="button" id="btn-paste-toggle" class="secondary-btn">Coller du texte</button>
+        </div>
+        <p class="dropzone-hint">ou glissez-déposez vos fichiers ici</p>
       </div>
       <textarea id="paste-area" class="hidden" rows="8" placeholder="Collez ici du texte — CSV/TSV, ou un texte de questions au format Markdown"></textarea>
       <button type="button" id="btn-parse" class="hidden">Analyser ce texte</button>
@@ -163,7 +166,7 @@
 </main>
 
 <footer>
-  Génère un fichier .lss (structure d'enquête LimeSurvey) directement dans votre navigateur — rien n'est envoyé à un serveur.<br>
+  Génération d'un fichier .lss (structure d'enquête LimeSurvey) directement dans le navigateur, aucune donnée envoyée à un serveur.<br>
   <a href="LICENSE">CC BY 4.0</a> — Bertrand Formet
 </footer>
 

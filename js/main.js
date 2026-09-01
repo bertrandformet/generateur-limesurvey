@@ -12,6 +12,7 @@ const SID = 100000 + Math.floor(Math.random() * 800000);
 const el = (id) => document.getElementById(id);
 
 const fileInput = el("file-input");
+const dropzone = el("dropzone");
 const pasteToggleBtn = el("btn-paste-toggle");
 const pasteArea = el("paste-area");
 const parseBtn = el("btn-parse");
@@ -159,6 +160,29 @@ fileInput.addEventListener("change", async () => {
   if (files.length === 0) return;
   await importFiles(files);
   fileInput.value = "";
+});
+
+// Drag-and-drop onto the dropzone — dragCounter avoids the is-dragover
+// class flickering as the dragenter/dragleave pair fires for every child
+// element the pointer passes over on its way in/out.
+let dropzoneDragCounter = 0;
+dropzone.addEventListener("dragenter", (e) => {
+  e.preventDefault();
+  dropzoneDragCounter++;
+  dropzone.classList.add("is-dragover");
+});
+dropzone.addEventListener("dragover", (e) => e.preventDefault());
+dropzone.addEventListener("dragleave", () => {
+  dropzoneDragCounter = Math.max(0, dropzoneDragCounter - 1);
+  if (dropzoneDragCounter === 0) dropzone.classList.remove("is-dragover");
+});
+dropzone.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  dropzoneDragCounter = 0;
+  dropzone.classList.remove("is-dragover");
+  const files = Array.from(e.dataTransfer?.files || []);
+  if (files.length === 0) return;
+  await importFiles(files);
 });
 
 parseBtn.addEventListener("click", async () => {
@@ -444,6 +468,28 @@ function reorderQuestion(draggedCode, targetCode, after) {
   list.splice(toIdx, 0, moved);
 }
 
+// Question/option text can run long (real quiz content, not just labels) —
+// a single-line <input> silently truncates it with no way to see the rest
+// without focusing and scrolling character-by-character. A textarea that
+// grows with its content shows everything at a glance instead.
+function autosizeTextarea(ta) {
+  ta.style.height = "auto";
+  ta.style.height = `${ta.scrollHeight}px`;
+}
+
+function createAutosizeTextarea(className, value, onInput) {
+  const ta = document.createElement("textarea");
+  if (className) ta.className = className;
+  ta.rows = 1;
+  ta.value = value;
+  ta.addEventListener("input", () => {
+    onInput(ta.value);
+    autosizeTextarea(ta);
+  });
+  requestAnimationFrame(() => autosizeTextarea(ta));
+  return ta;
+}
+
 function renderQuestionList() {
   questionList.innerHTML = "";
   state.importedQuestions.forEach((q) => {
@@ -537,12 +583,8 @@ function renderQuestionList() {
       codeRow.appendChild(weightLabel);
     }
 
-    const textInput = document.createElement("input");
-    textInput.type = "text";
-    textInput.className = "q-text-input";
-    textInput.value = q.text;
-    textInput.addEventListener("input", () => {
-      q.text = textInput.value;
+    const textInput = createAutosizeTextarea("q-text-input", q.text, (value) => {
+      q.text = value;
       renderPreview();
     });
 
@@ -576,11 +618,8 @@ function renderQuestionList() {
       letter.className = "q-option-letter";
       letter.textContent = opt.code;
 
-      const optText = document.createElement("input");
-      optText.type = "text";
-      optText.value = opt.text;
-      optText.addEventListener("input", () => {
-        opt.text = optText.value;
+      const optText = createAutosizeTextarea(null, opt.text, (value) => {
+        opt.text = value;
         renderPreview();
       });
 
