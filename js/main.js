@@ -75,7 +75,9 @@ const newFieldMandatory = el("new-field-mandatory");
 const newFieldMandatoryWrap = el("new-field-mandatory-wrap");
 const addFieldBtn = el("btn-add-field");
 const newFieldImageBlock = el("new-field-image-block");
+const newFieldImageDropzone = el("new-field-image-dropzone");
 const newFieldImageFile = el("new-field-image-file");
+const newFieldImageLabel = el("new-field-image-label");
 const newFieldImageUrl = el("new-field-image-url");
 
 function currentFieldKind() {
@@ -91,6 +93,30 @@ function updateAddFieldFormVisibility() {
 }
 newFieldKindInputs.forEach((r) => r.addEventListener("change", updateAddFieldFormVisibility));
 updateAddFieldFormVisibility();
+
+// Image field's own dropzone — same click/keyboard/drag-drop pattern as
+// the main import dropzone (js/main.js further down), just scoped to a
+// single file and reflecting the chosen name back into the label.
+function updateImageFileLabel() {
+  const f = newFieldImageFile.files[0];
+  newFieldImageLabel.textContent = f ? f.name : "Choisir un fichier";
+}
+newFieldImageDropzone.addEventListener("click", (e) => {
+  if (e.target === newFieldImageFile) return;
+  newFieldImageFile.click();
+});
+newFieldImageDropzone.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  newFieldImageFile.click();
+});
+newFieldImageFile.addEventListener("change", updateImageFileLabel);
+wireDragAndDrop(newFieldImageDropzone, (files) => {
+  const dt = new DataTransfer();
+  dt.items.add(files[0]);
+  newFieldImageFile.files = dt.files;
+  updateImageFileLabel();
+});
 
 const previewList = el("preview-list");
 
@@ -177,28 +203,32 @@ fileInput.addEventListener("change", async () => {
   fileInput.value = "";
 });
 
-// Drag-and-drop onto the dropzone — dragCounter avoids the is-dragover
-// class flickering as the dragenter/dragleave pair fires for every child
-// element the pointer passes over on its way in/out.
-let dropzoneDragCounter = 0;
-dropzone.addEventListener("dragenter", (e) => {
-  e.preventDefault();
-  dropzoneDragCounter++;
-  dropzone.classList.add("is-dragover");
-});
-dropzone.addEventListener("dragover", (e) => e.preventDefault());
-dropzone.addEventListener("dragleave", () => {
-  dropzoneDragCounter = Math.max(0, dropzoneDragCounter - 1);
-  if (dropzoneDragCounter === 0) dropzone.classList.remove("is-dragover");
-});
-dropzone.addEventListener("drop", async (e) => {
-  e.preventDefault();
-  dropzoneDragCounter = 0;
-  dropzone.classList.remove("is-dragover");
-  const files = Array.from(e.dataTransfer?.files || []);
-  if (files.length === 0) return;
-  await importFiles(files);
-});
+// Drag-and-drop onto a dropzone element — a counter avoids the
+// is-dragover class flickering as the dragenter/dragleave pair fires for
+// every child element the pointer passes over on its way in/out. Shared
+// between the main import dropzone and the image-field dropzone below.
+function wireDragAndDrop(zoneEl, onFiles) {
+  let counter = 0;
+  zoneEl.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    counter++;
+    zoneEl.classList.add("is-dragover");
+  });
+  zoneEl.addEventListener("dragover", (e) => e.preventDefault());
+  zoneEl.addEventListener("dragleave", () => {
+    counter = Math.max(0, counter - 1);
+    if (counter === 0) zoneEl.classList.remove("is-dragover");
+  });
+  zoneEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    counter = 0;
+    zoneEl.classList.remove("is-dragover");
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (files.length > 0) onFiles(files);
+  });
+}
+
+wireDragAndDrop(dropzone, (files) => importFiles(files));
 
 parseBtn.addEventListener("click", async () => {
   const text = pasteArea.value;
@@ -725,6 +755,7 @@ function pushField(field) {
   newFieldText.value = "";
   newFieldImageUrl.value = "";
   newFieldImageFile.value = "";
+  updateImageFileLabel();
   newFieldMandatory.checked = false;
   renderFieldsList();
   renderPreview();

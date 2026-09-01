@@ -113,8 +113,12 @@
         <input type="text" id="new-field-label" placeholder="Libellé du champ (ex. Prénom)">
         <textarea id="new-field-text" class="hidden" rows="3" placeholder="Texte à afficher (peut contenir du HTML simple, ex. <strong>...</strong>)"></textarea>
         <div id="new-field-image-block" class="hidden add-field-image-block">
-          <input type="file" id="new-field-image-file" accept="image/*">
-          <span class="or">ou</span>
+          <div class="dropzone dropzone-compact" id="new-field-image-dropzone" role="button" tabindex="0">
+            <input type="file" id="new-field-image-file" class="visually-hidden" accept="image/*" tabindex="-1">
+            <p class="dropzone-label" id="new-field-image-label">Choisir un fichier</p>
+            <p class="dropzone-hint">ou glissez-déposez-le ici</p>
+          </div>
+          <div class="import-or-row"><span class="or">ou</span></div>
           <input type="text" id="new-field-image-url" placeholder="URL d'une image (https://...)">
           <p class="hint image-size-hint">Un fichier importé est encodé directement dans le .lss : préférez une image légère (quelques centaines de Ko) ou une URL pour un fichier plus lourd.</p>
         </div>

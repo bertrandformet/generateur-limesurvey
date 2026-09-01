@@ -670,7 +670,9 @@ select#new-field-position {
 .add-field-row input[type="text"] { flex: 1; }
 
 .add-field-image-block { display: flex; flex-direction: column; gap: 8px; }
-.add-field-image-block .or { color: var(--ink-faint); font-size: 13px; }
+.dropzone-compact { padding: 16px; }
+.import-or-row { text-align: center; }
+.import-or-row .or { color: var(--ink-faint); font-size: 13px; }
 #new-field-image-url {
   width: 100%;
   border: 1px solid var(--rule);
