@@ -4,9 +4,7 @@ Outil web (statique, sans backend) pour importer une banque de questions, en
 sélectionner une partie, ajouter des champs personnalisés (nom, prénom...),
 et générer un fichier `.lss` prêt à importer dans LimeSurvey.
 
-**V1 : questionnaire à plat**, sans niveaux ni paliers de déblocage — voir
-`/Users/bertrand.formet/.claude/plans/peaceful-knitting-swan.md` pour le plan
-complet et les décisions d'architecture.
+**V1 : questionnaire à plat**, sans niveaux ni paliers de déblocage.
 
 ## Utilisation locale
 
@@ -102,10 +100,3 @@ Q2;M;Cochez les nombres pairs;2;3;4;5;"A,C"
   (`/Users/bertrand.formet/code/generateur-quiz-limesurvey`) mais la
   création du dépôt distant et le push demandent une confirmation explicite
   (action visible/partagée), pas encore donnée.
-
-## Prochaine étape
-
-Tests réels sur une instance LimeSurvey déjà menés avec succès (multi-fichiers,
-positionnement de champs, édition, type S) — voir le plan pour le protocole
-complet. Reste à décider : gabarit XLSX pour `parse-markdown-quiz.js`, et
-si/quand pousser le dépôt sur GitHub Pages.
