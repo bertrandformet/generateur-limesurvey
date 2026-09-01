@@ -313,15 +313,13 @@ function renderUnrecognized() {
     "**Quelle est la capitale de la France ?**\n" +
     "- [ ] **A.** Lyon\n" +
     "- [ ] **B.** Paris\n" +
-    "- [ ] **C.** Marseille</pre>" +
-    "<strong>Si vos questions et leur corrigé viennent de deux documents séparés</strong> (chacun affiché " +
-    "dans son propre panneau ci-dessous), pas besoin de fusionner leurs textes : réécrivez chacun dans son " +
-    "propre format, en validant chacun séparément — le rapprochement entre une question et sa bonne " +
-    "réponse se fait ensuite automatiquement par numéro. Le corrigé se réécrit ainsi (le nom de l'option " +
-    "suffit, pas besoin de répéter les 4 options) :" +
-    "<pre class=\"example-block\">## Question 1 — Réponses A et C\n" +
-    "- **A — Correct.** ...\n" +
-    "- **B — Incorrect.** ...</pre>" +
+    "- [ ] **C.** Marseille\n\n" +
+    "## Question 1 — Réponse B</pre>" +
+    "Pour indiquer la bonne réponse, il suffit de répéter le même numéro de question dans un second " +
+    "titre « Réponse(s) » — pas besoin de réexpliquer chaque option. " +
+    "<strong>Si vos questions et leur corrigé viennent de deux documents séparés</strong>, pas besoin de " +
+    "les fusionner : réécrivez chacun dans son propre format ci-dessous (un panneau par document) et " +
+    "validez-les séparément — le rapprochement se fait ensuite automatiquement par numéro de question. " +
     "Une fois validé, chaque texte reconstruit rejoint automatiquement la liste des questions à " +
     "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé.";
   unrecognizedBox.appendChild(hint);
