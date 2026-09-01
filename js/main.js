@@ -11,6 +11,43 @@ const SID = 100000 + Math.floor(Math.random() * 800000);
 
 const el = (id) => document.getElementById(id);
 
+// --- Theme toggle ----------------------------------------------------------
+// data-theme on <html> overrides prefers-color-scheme in either direction
+// (see style.css :root[data-theme] blocks) — saved in localStorage so the
+// choice survives a reload. Absence of the attribute falls back to the OS
+// setting, same as before this toggle existed.
+const THEME_KEY = "lss-gen-theme";
+const themeToggle = el("theme-toggle");
+
+function currentEffectiveTheme() {
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr === "light" || attr === "dark") return attr;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function updateThemeToggleIcon() {
+  themeToggle.classList.toggle("is-dark", currentEffectiveTheme() === "dark");
+}
+
+try {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "light" || saved === "dark") document.documentElement.setAttribute("data-theme", saved);
+} catch (e) {
+  // localStorage unavailable (private mode, etc.) — falls back to OS theme.
+}
+updateThemeToggleIcon();
+
+themeToggle.addEventListener("click", () => {
+  const next = currentEffectiveTheme() === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  updateThemeToggleIcon();
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch (e) {
+    // ignore — theme just won't persist across reloads
+  }
+});
+
 const fileInput = el("file-input");
 const dropzone = el("dropzone");
 const pasteBox = el("paste-box");
@@ -583,9 +620,11 @@ function renderQuestionList() {
     const cb = document.createElement("input");
     cb.type = "checkbox";
     cb.checked = state.selectedCodes.has(q.code);
+    row.classList.toggle("is-selected", cb.checked);
     cb.addEventListener("change", () => {
       if (cb.checked) state.selectedCodes.add(q.code);
       else state.selectedCodes.delete(q.code);
+      row.classList.toggle("is-selected", cb.checked);
       renderFieldPositionOptions();
       renderPreview();
       renderSummary();
