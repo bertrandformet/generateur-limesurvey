@@ -1,24 +1,24 @@
 # Générateur de questionnaire LimeSurvey
 
-Un outil web gratuit pour créer un questionnaire LimeSurvey à partir d'une
+Un outil web pour créer un questionnaire LimeSurvey à partir d'une
 banque de questions, sans avoir à connaître le format technique attendu par
-LimeSurvey. Tout se passe dans votre navigateur — aucune donnée n'est
+LimeSurvey. Tout se passe dans le navigateur, aucune donnée n'est
 envoyée à un serveur.
 
 **👉 Utiliser l'outil en ligne : https://bertrandformet.github.io/generateur-limesurvey/**
 
 ## Comment ça marche
 
-1. **Importer** — déposez un ou plusieurs fichiers (CSV, Word, PDF,
-   Markdown...) contenant vos questions. Un corrigé séparé peut compléter
+1. **Importer** : déposez un ou plusieurs fichiers (CSV, Word, PDF,
+   Markdown...) ou du texte contenant vos questions. Un corrigé séparé peut compléter
    automatiquement les bonnes réponses.
-2. **Sélectionner et modifier** — cochez les questions à garder ; le texte
+2. **Sélectionner et modifier** : cochez les questions à garder ; le texte
    des questions et des réponses, ainsi que le nombre de points attribués à
    chacune, sont modifiables directement.
-3. **Ajouter des champs** — nom, prénom, établissement, une consigne... à
+3. **Ajouter des champs** : nom, prénom, établissement, une consigne... à
    placer où vous voulez dans le questionnaire.
-4. **Aperçu** — vérifiez l'ordre exact avant de générer.
-5. **Générer** — téléchargez le fichier `.lss` prêt à importer.
+4. **Aperçu** : vérifiez l'ordre exact avant de générer.
+5. **Générer** : téléchargez le fichier `.lss` prêt à importer.
 
 ## Importer le fichier dans LimeSurvey
 
@@ -57,15 +57,15 @@ et affiché pour un ajustement manuel avant réimport.
 
 ## Confidentialité
 
-Tout se passe dans votre navigateur, rien n'est envoyé à un serveur. Vos
-fichiers, vos questions, vos modifications ne sont jamais transmis nulle
-part — l'outil ne dispose d'ailleurs d'aucun serveur à qui les envoyer.
+Tout se passe dans le navigateur, rien n'est envoyé à un serveur. Les
+fichiers, les questions, les modifications ne sont jamais transmis nulle
+part : l'outil ne dispose d'ailleurs d'aucun serveur à qui les envoyer.
 Rien n'est conservé non plus d'une visite à l'autre : fermer ou recharger
 la page efface tout ce qui a été importé ou saisi.
 
 Seule exception : au premier import d'un PDF, DOCX ou XLSX, le navigateur
 télécharge la bibliothèque nécessaire à sa lecture (ex. pdf.js) depuis un
-service de distribution de code public (esm.sh) — ce téléchargement ne
+service de distribution de code public (esm.sh). Ce téléchargement ne
 contient que du code, jamais vos données.
 
 ## Licence
