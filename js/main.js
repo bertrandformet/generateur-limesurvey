@@ -16,6 +16,7 @@ const pasteToggleBtn = el("btn-paste-toggle");
 const pasteArea = el("paste-area");
 const parseBtn = el("btn-parse");
 const templateBtn = el("btn-template");
+const templateMdBtn = el("btn-template-md");
 const warningsBox = el("import-warnings");
 
 const stepSelect = el("step-select");
@@ -93,6 +94,16 @@ templateBtn.addEventListener("click", () => {
     "Q1;L;Quelle est la capitale de la France ?;Lyon;Paris;Marseille;;B;1\n" +
     "Q2;M;Cochez les nombres pairs ;2;3;4;5;\"A,C\";2\n";
   downloadBlob("gabarit_questions.csv", sample, "text/csv;charset=utf-8");
+});
+
+templateMdBtn.addEventListener("click", () => {
+  const sample =
+    "## Question 1 — Capitale de la France\n\n" +
+    "**Quelle est la capitale de la France ?**\n\n" +
+    "- [ ] **A.** Lyon\n" +
+    "- [ ] **B.** Paris\n" +
+    "- [ ] **C.** Marseille\n";
+  downloadBlob("gabarit_questions.md", sample, "text/markdown;charset=utf-8");
 });
 
 pasteToggleBtn.addEventListener("click", () => {
