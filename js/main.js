@@ -150,56 +150,51 @@ async function importFiles(files) {
   await importSources(sources);
 }
 
-// A source's text is tried, in order, as: (1) a CSV/TSV template, (2) a
+// Tries one source's text, in order, as: (1) a CSV/TSV template, (2) a
 // Markdown question bank (checkbox-style options), (3) a Markdown answer
 // key ("corrigé") — a source can match more than one (e.g. a corrigé is
-// only an answer key, a quiz file is only questions). Whatever matches
-// nothing at all is surfaced as raw text for manual review, instead of
-// being silently dropped.
-async function importSources(sources) {
-  const allWarnings = [...(state.importWarnings || [])];
-  const unrecognized = [];
-  const pendingAnswerKeys = [];
+// only an answer key, a quiz file is only questions). Mutates
+// state.importedQuestions directly (via appendQuestions) and pushes any
+// answer key found into pendingAnswerKeys for the caller to apply once all
+// sources of this batch are known. Returns whether anything matched at all.
+function processOneSource(src, allWarnings, pendingAnswerKeys) {
+  const label = src.label;
+  let matched = false;
 
-  for (const src of sources) {
-    const label = src.label;
-    let matched = false;
-
-    if (["csv", "tsv", "txt"].includes(src.rawExt)) {
-      const { rows } = parseDelimited(src.text);
-      const { questions, warnings } = normalizeRows(rows);
-      if (questions.length > 0) {
-        matched = appendQuestions(questions, label, allWarnings) || matched;
-        allWarnings.push(...warnings.map((w) => `[${label}] ${w}`));
-      }
-    }
-
-    // Tried before the question parser: a "corrigé" document's headings
-    // ("### Question 1 — Réponses B et D") also look like the start of a
-    // question to parseMarkdownQuestions, which would otherwise report a
-    // confusing "no options found" warning for a source that in fact parsed
-    // fine as an answer key.
-    const { answerKey, warnings: akWarnings } = parseMarkdownAnswerKey(src.text, label);
-    if (Object.keys(answerKey).length > 0) {
-      pendingAnswerKeys.push({ label, answerKey });
-      matched = true;
-    }
-
-    const isAnswerKeySource = Object.keys(answerKey).length > 0;
-    const { questions: mdQuestions, warnings: mdWarnings } = parseMarkdownQuestions(src.text, label);
-    if (mdQuestions.length > 0) {
-      matched = appendQuestions(mdQuestions, label, allWarnings) || matched;
-    }
-    if (!isAnswerKeySource) {
-      allWarnings.push(...mdWarnings.map((w) => `[${label}] ${w}`));
-    }
-    allWarnings.push(...akWarnings.map((w) => `[${label}] ${w}`));
-
-    if (!matched) {
-      unrecognized.push({ label, text: src.text });
+  if (["csv", "tsv", "txt"].includes(src.rawExt)) {
+    const { rows } = parseDelimited(src.text);
+    const { questions, warnings } = normalizeRows(rows);
+    if (questions.length > 0) {
+      matched = appendQuestions(questions, label, allWarnings) || matched;
+      allWarnings.push(...warnings.map((w) => `[${label}] ${w}`));
     }
   }
 
+  // Tried before the question parser: a "corrigé" document's headings
+  // ("### Question 1 — Réponses B et D") also look like the start of a
+  // question to parseMarkdownQuestions, which would otherwise report a
+  // confusing "no options found" warning for a source that in fact parsed
+  // fine as an answer key.
+  const { answerKey, warnings: akWarnings } = parseMarkdownAnswerKey(src.text, label);
+  if (Object.keys(answerKey).length > 0) {
+    pendingAnswerKeys.push({ label, answerKey });
+    matched = true;
+  }
+
+  const isAnswerKeySource = Object.keys(answerKey).length > 0;
+  const { questions: mdQuestions, warnings: mdWarnings } = parseMarkdownQuestions(src.text, label);
+  if (mdQuestions.length > 0) {
+    matched = appendQuestions(mdQuestions, label, allWarnings) || matched;
+  }
+  if (!isAnswerKeySource) {
+    allWarnings.push(...mdWarnings.map((w) => `[${label}] ${w}`));
+  }
+  allWarnings.push(...akWarnings.map((w) => `[${label}] ${w}`));
+
+  return matched;
+}
+
+function applyPendingAnswerKeys(pendingAnswerKeys, allWarnings) {
   // Applied after every source has been scanned, so it doesn't matter
   // whether the quiz or its corrigé was imported/dropped first.
   for (const { label, answerKey } of pendingAnswerKeys) {
@@ -208,8 +203,43 @@ async function importSources(sources) {
       allWarnings.push(`[${label}] réponses pour ${unmatched.join(", ")} sans question importée correspondante.`);
     }
   }
+}
 
-  finishImport(allWarnings, unrecognized);
+async function importSources(sources) {
+  const allWarnings = [...(state.importWarnings || [])];
+  const pendingAnswerKeys = [];
+
+  for (const src of sources) {
+    const matched = processOneSource(src, allWarnings, pendingAnswerKeys);
+    if (!matched) {
+      state.unrecognized.push({ label: src.label, text: src.text });
+    }
+  }
+
+  applyPendingAnswerKeys(pendingAnswerKeys, allWarnings);
+  finishImport(allWarnings);
+}
+
+// Re-tries one already-shown "unrecognized" item using its (possibly
+// hand-edited) textarea content, without requiring a manual copy/paste into
+// the main paste area. Removes the item from the list on success.
+function retryUnrecognized(item, ta) {
+  const text = ta.value;
+  const allWarnings = [...(state.importWarnings || [])];
+  const pendingAnswerKeys = [];
+  const src = { label: item.label, text, rawExt: "txt" };
+  const matched = processOneSource(src, allWarnings, pendingAnswerKeys);
+  applyPendingAnswerKeys(pendingAnswerKeys, allWarnings);
+
+  if (matched) {
+    const idx = state.unrecognized.indexOf(item);
+    if (idx !== -1) state.unrecognized.splice(idx, 1);
+    finishImport(allWarnings);
+    return true;
+  }
+
+  item.text = text;
+  return false;
 }
 
 function appendQuestions(questions, label, warningsOut) {
@@ -228,10 +258,10 @@ function appendQuestions(questions, label, warningsOut) {
   return added.length > 0;
 }
 
-function finishImport(warnings, unrecognized) {
+function finishImport(warnings) {
   state.importWarnings = warnings;
   renderWarnings();
-  renderUnrecognized(unrecognized || []);
+  renderUnrecognized();
   renderAll();
 
   const has = state.importedQuestions.length > 0;
@@ -252,7 +282,8 @@ function renderWarnings() {
   });
 }
 
-function renderUnrecognized(list) {
+function renderUnrecognized() {
+  const list = state.unrecognized;
   unrecognizedBox.innerHTML = "";
   if (list.length === 0) {
     unrecognizedBox.classList.add("hidden");
@@ -280,24 +311,45 @@ function renderUnrecognized(list) {
       "- [ ] **A.** Lyon\n" +
       "- [ ] **B.** Paris\n" +
       "- [ ] **C.** Marseille</pre>" +
-      "<strong>Si questions et corrigé sont dans deux documents séparés</strong> (comme ici), " +
-      "pas besoin de les fusionner : réécrivez chacun dans son propre format, puis collez-les " +
-      "l'un après l'autre (bouton « Coller du texte », deux fois) — le rapprochement entre une " +
-      "question et sa bonne réponse se fait automatiquement par numéro. Le corrigé se réécrit " +
-      "ainsi (le nom de l'option suffit, pas besoin de répéter les 4 options) :" +
+      "<strong>Si vos questions et leur corrigé viennent de deux documents séparés</strong>, pas besoin " +
+      "de fusionner leurs textes : réécrivez chacun dans son propre format ci-dessous (un onglet ou un " +
+      "panneau par document), en validant chacun séparément — le rapprochement entre une question et sa " +
+      "bonne réponse se fait ensuite automatiquement par numéro. Le corrigé se réécrit ainsi (le nom de " +
+      "l'option suffit, pas besoin de répéter les 4 options) :" +
       "<pre class=\"example-block\">## Question 1 — Réponses A et C\n" +
       "- **A — Correct.** ...\n" +
       "- **B — Incorrect.** ...</pre>" +
-      "Une fois collé, chaque texte reconstruit rejoint automatiquement la liste des questions " +
-      "à l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà collé.";
+      "Une fois validé, chaque texte reconstruit rejoint automatiquement la liste des questions à " +
+      "l'étape suivante — inutile de cocher les bonnes réponses à la main si le corrigé est déjà validé.";
 
     const ta = document.createElement("textarea");
     ta.value = item.text;
     ta.readOnly = false;
 
+    const actionRow = document.createElement("div");
+    actionRow.className = "unrecognized-actions";
+
+    const status = document.createElement("span");
+    status.className = "unrecognized-status";
+
+    const retryBtn = document.createElement("button");
+    retryBtn.type = "button";
+    retryBtn.className = "secondary-btn";
+    retryBtn.textContent = "Valider ce texte";
+    retryBtn.addEventListener("click", () => {
+      const ok = retryUnrecognized(item, ta);
+      if (!ok) {
+        status.textContent = "Toujours pas reconnu — vérifiez le format ci-dessus.";
+      }
+    });
+
+    actionRow.appendChild(retryBtn);
+    actionRow.appendChild(status);
+
     box.appendChild(title);
     box.appendChild(hint);
     box.appendChild(ta);
+    box.appendChild(actionRow);
     unrecognizedBox.appendChild(box);
   });
 }

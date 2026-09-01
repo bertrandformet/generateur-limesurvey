@@ -96,7 +96,12 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
   return { questions, warnings };
 }
 
-const ANSWER_HEADING_RE = /Question\s+(\d+).*?R[ée]ponses?\s*(?:correctes?)?\s*:?\s*(.+)$/i;
+// The remainder after "Réponses" must be ONLY a letter list (A et D / A, C et D)
+// with nothing else, anchored to the end of the heading — otherwise a plain
+// question title that happens to contain the word "réponse(s)" (e.g.
+// "Fiabilité des réponses", "Évaluer une réponse complexe") gets mistaken
+// for a corrigé heading.
+const ANSWER_HEADING_RE = /Question\s+(\d+).*?R[ée]ponses?\s*(?:correctes?)?\s*:?\s*([A-F](?:\s*(?:,|et)\s*[A-F])*)\s*$/i;
 const ANSWER_INLINE_RE = /R[ée]ponses?\s+correctes?\s*:?\s*(.+)$/i;
 
 function extractLetters(text) {

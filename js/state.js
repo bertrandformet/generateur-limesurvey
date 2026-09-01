@@ -5,6 +5,7 @@ export function createAppState() {
   return {
     importedQuestions: [], // canonical shape from normalize.js
     importWarnings: [],
+    unrecognized: [], // [{ label, text }] — sources that matched no known format
     selectedCodes: new Set(),
     customFields: [], // { code, label, mandatory }
   };
