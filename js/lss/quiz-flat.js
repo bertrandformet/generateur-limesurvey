@@ -59,8 +59,13 @@ export function buildFlatQuiz({ sid, title, customFields, questions }) {
       continue;
     }
 
+    // scored:false — a self-assessment / opinion question (e.g. a Likert
+    // mastery scale) built from parseImplicitChecklists: still a real L/M
+    // choice question in the survey, just excluded from the score formula
+    // since there is no "correct" answer to check it against.
+    const scored = item.scored !== false;
     const weight = item.weight && item.weight > 0 ? item.weight : 1;
-    totalPoints += weight;
+    if (scored) totalPoints += weight;
 
     let rawFormula;
     if (item.type === "L") {
@@ -82,9 +87,11 @@ export function buildFlatQuiz({ sid, title, customFields, questions }) {
         order: order++,
       }));
     }
-    // rawFormula is if(...,1,0) — scale by this question's coefficient so the
-    // score reflects weighted points rather than a plain correct-answer count.
-    formulaParts.push(weight === 1 ? rawFormula : `(${rawFormula})*${weight}`);
+    if (scored) {
+      // rawFormula is if(...,1,0) — scale by this question's coefficient so
+      // the score reflects weighted points rather than a plain count.
+      formulaParts.push(weight === 1 ? rawFormula : `(${rawFormula})*${weight}`);
+    }
   }
 
   const scoreFormula = formulaParts.length > 0 ? formulaParts.join(" + ") : "0";

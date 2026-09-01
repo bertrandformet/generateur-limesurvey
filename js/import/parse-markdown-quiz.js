@@ -107,6 +107,94 @@ export function parseMarkdownQuestions(mdText, sourceLabel) {
   return { questions, warnings };
 }
 
+// Self-assessment / positioning forms (Word "☐ option" lists) don't use
+// "## Question N" headings at all — a bold prompt line is directly followed
+// by a run of ☐-prefixed option lines, with no letters and no marked
+// correct answer:
+//
+//   **Concernant le 1er objectif, indiquez votre niveau de maîtrise :**
+//   ☐ Maîtrise insuffisante
+//   ☐ Maîtrise fragile
+//
+// These have no "right" answer (it's a self-assessment, not a quiz), so
+// every question found here comes back with scored:false — see
+// js/lss/quiz-flat.js, which skips these when building the score formula.
+// Runs on the same text as parseMarkdownQuestions and never overlaps with
+// it: "- [ ] **A.**" bracket options (the scored format) don't match
+// IMPLICIT_OPTION_RE, and a heading line ("#...") never starts with "**".
+// Matches a line that STARTS with a bold run rather than requiring the
+// whole line to be bold, since Word sometimes leaves an annotation like
+// "(Plusieurs réponses possibles)" trailing outside the bold markers.
+const BOLD_PROMPT_RE = /^\*\*.+/;
+const IMPLICIT_OPTION_RE = /^[☐☑☒□]\s*(.+)$/;
+const MULTI_SELECT_HINT_RE = /plusieurs\s+(r[ée]ponses|choix)/i;
+
+function sourceCodePrefix(sourceLabel) {
+  const base = sourceLabel
+    .replace(/\.[a-z0-9]+$/i, "")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "")
+    .toUpperCase()
+    .slice(0, 8);
+  return base || "LK";
+}
+
+/**
+ * @returns {{ questions: {code:string,type:"M"|"L",text:string,options:{code:string,text:string}[],correct:string[],weight:1,scored:false}[] }}
+ */
+export function parseImplicitChecklists(mdText, sourceLabel) {
+  const lines = mdText.split(/\r?\n/);
+  const prefix = sourceCodePrefix(sourceLabel);
+  const questions = [];
+  let counter = 0;
+  let pendingPrompt = null;
+  let optionsBuffer = [];
+
+  function flush() {
+    if (optionsBuffer.length < 2 || !pendingPrompt) {
+      optionsBuffer = [];
+      return;
+    }
+    counter += 1;
+    questions.push({
+      code: `${prefix}_LK${counter}`,
+      type: MULTI_SELECT_HINT_RE.test(pendingPrompt) ? "M" : "L",
+      text: pendingPrompt,
+      options: optionsBuffer,
+      correct: [],
+      weight: 1,
+      scored: false,
+    });
+    optionsBuffer = [];
+  }
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    const opt = line.match(IMPLICIT_OPTION_RE);
+    if (opt) {
+      const code = String.fromCharCode(65 + optionsBuffer.length);
+      optionsBuffer.push({ code, text: opt[1].trim() });
+      continue;
+    }
+
+    if (BOLD_PROMPT_RE.test(line)) {
+      flush();
+      pendingPrompt = line.replace(/\*\*/g, "").trim();
+      continue;
+    }
+
+    // Any other line ends the current option run without starting a new
+    // prompt (e.g. a heading, or plain body text between two blocks).
+    flush();
+  }
+  flush();
+
+  return { questions };
+}
+
 // The remainder after "Réponses" must be ONLY a letter list (A et D / A, C et D)
 // with nothing else, anchored to the end of the heading — otherwise a plain
 // question title that happens to contain the word "réponse(s)" (e.g.

@@ -1,7 +1,7 @@
 import { parseDelimited } from "./import/parse-tabular.js";
 import { normalizeRows } from "./import/normalize.js";
 import { convert as convertToMarkdown, getExt } from "./import/converters/index.js";
-import { parseMarkdownQuestions, parseMarkdownAnswerKey, applyAnswerKey } from "./import/parse-markdown-quiz.js";
+import { parseMarkdownQuestions, parseMarkdownAnswerKey, applyAnswerKey, parseImplicitChecklists } from "./import/parse-markdown-quiz.js";
 import { createAppState, makeFieldCode } from "./state.js";
 import { buildFlatQuiz } from "./lss/quiz-flat.js";
 import { buildSequence } from "./sequence.js";
@@ -195,6 +195,14 @@ function processOneSource(src, allWarnings, pendingAnswerKeys) {
     allWarnings.push(...mdWarnings.map((w) => `[${label}] ${w}`));
   }
   allWarnings.push(...akWarnings.map((w) => `[${label}] ${w}`));
+
+  // Self-assessment forms (Word "☐ option" lists, no "## Question N"
+  // headings) — never overlaps with the two parsers above, see
+  // parseImplicitChecklists' own comment for why.
+  const { questions: implicitQuestions } = parseImplicitChecklists(src.text, label);
+  if (implicitQuestions.length > 0) {
+    matched = appendQuestions(implicitQuestions, label, allWarnings) || matched;
+  }
 
   return matched;
 }
@@ -444,17 +452,19 @@ function renderQuestionList() {
     body.className = "q-body";
 
     if (!(q.weight > 0)) q.weight = 1;
+    const scored = q.type !== "T" && q.scored !== false;
 
     const codeRow = document.createElement("div");
     codeRow.className = "q-code-row";
 
     const codeSpan = document.createElement("span");
     codeSpan.className = "q-code";
-    codeSpan.textContent = q.type === "T" ? "réponse libre (non notée)" : q.type === "L" ? "choix unique" : "cases à cocher";
+    const kindLabel = q.type === "T" ? "réponse libre" : q.type === "L" ? "choix unique" : "cases à cocher";
+    codeSpan.textContent = scored ? kindLabel : `${kindLabel} (non notée)`;
 
     codeRow.appendChild(codeSpan);
 
-    if (q.type !== "T") {
+    if (scored) {
       const weightLabel = document.createElement("label");
       weightLabel.className = "q-weight-label";
       weightLabel.textContent = "Coefficient";
@@ -490,21 +500,24 @@ function renderQuestionList() {
       const optRow = document.createElement("label");
       optRow.className = "q-option-row" + (q.correct.includes(opt.code) ? " is-correct" : "");
 
-      const optToggle = document.createElement("input");
-      optToggle.type = q.type === "L" ? "radio" : "checkbox";
-      if (q.type === "L") optToggle.name = `correct-${q.code}`;
-      optToggle.checked = q.correct.includes(opt.code);
-      optToggle.addEventListener("change", () => {
-        if (q.type === "L") {
-          q.correct = [opt.code];
-        } else if (optToggle.checked) {
-          if (!q.correct.includes(opt.code)) q.correct.push(opt.code);
-        } else {
-          q.correct = q.correct.filter((c) => c !== opt.code);
-        }
-        renderQuestionList();
-        renderPreview();
-      });
+      if (scored) {
+        const optToggle = document.createElement("input");
+        optToggle.type = q.type === "L" ? "radio" : "checkbox";
+        if (q.type === "L") optToggle.name = `correct-${q.code}`;
+        optToggle.checked = q.correct.includes(opt.code);
+        optToggle.addEventListener("change", () => {
+          if (q.type === "L") {
+            q.correct = [opt.code];
+          } else if (optToggle.checked) {
+            if (!q.correct.includes(opt.code)) q.correct.push(opt.code);
+          } else {
+            q.correct = q.correct.filter((c) => c !== opt.code);
+          }
+          renderQuestionList();
+          renderPreview();
+        });
+        optRow.appendChild(optToggle);
+      }
 
       const letter = document.createElement("span");
       letter.className = "q-option-letter";
@@ -518,7 +531,6 @@ function renderQuestionList() {
         renderPreview();
       });
 
-      optRow.appendChild(optToggle);
       optRow.appendChild(letter);
       optRow.appendChild(optText);
       optionsWrap.appendChild(optRow);
@@ -697,17 +709,19 @@ function renderPreview() {
       body.appendChild(tag);
       body.appendChild(document.createTextNode(item.text));
     } else {
+      const scored = item.scored !== false;
       const tag = document.createElement("span");
       tag.className = "p-tag";
+      const kindLabel = item.type === "L" ? "choix unique" : "cases à cocher";
       const weight = item.weight && item.weight > 0 ? item.weight : 1;
-      tag.textContent = `${item.type === "L" ? "choix unique" : "cases à cocher"} · ${weight} pt${weight > 1 ? "s" : ""}`;
+      tag.textContent = scored ? `${kindLabel} · ${weight} pt${weight > 1 ? "s" : ""}` : `${kindLabel} (non notée)`;
       body.appendChild(tag);
       body.appendChild(document.createTextNode(item.text));
 
       const opts = document.createElement("div");
       opts.className = "p-options";
       opts.innerHTML = item.options
-        .map((o) => (item.correct.includes(o.code) ? `<strong>${o.code}. ${escapeHtml(o.text)}</strong>` : `${o.code}. ${escapeHtml(o.text)}`))
+        .map((o) => (scored && item.correct.includes(o.code) ? `<strong>${o.code}. ${escapeHtml(o.text)}</strong>` : `${o.code}. ${escapeHtml(o.text)}`))
         .join(" &nbsp;·&nbsp; ");
       body.appendChild(opts);
     }
@@ -728,10 +742,11 @@ function renderSummary() {
   const selected = selectedQuestionsInOrder();
   const nQ = selected.length;
   const nF = state.customFields.length;
-  const nOpen = selected.filter((q) => q.type === "T").length;
-  const totalPoints = selected.reduce((sum, q) => sum + (q.type === "T" ? 0 : q.weight && q.weight > 0 ? q.weight : 1), 0);
+  const isScored = (q) => q.type !== "T" && q.scored !== false;
+  const nOpen = selected.filter((q) => !isScored(q)).length;
+  const totalPoints = selected.reduce((sum, q) => sum + (isScored(q) ? (q.weight && q.weight > 0 ? q.weight : 1) : 0), 0);
   const totalLabel = Number.isInteger(totalPoints) ? totalPoints : totalPoints.toFixed(2).replace(/\.?0+$/, "");
-  const openLabel = nOpen > 0 ? `, dont <strong>${nOpen}</strong> en réponse libre (non notée)` : "";
+  const openLabel = nOpen > 0 ? `, dont <strong>${nOpen}</strong> non notée(s)` : "";
   summaryBox.innerHTML = `<strong>${nQ}</strong> question(s) sélectionnée(s) (<strong>${totalLabel}</strong> point(s) au total${openLabel}), <strong>${nF}</strong> champ(s) additionnel(s).`;
   lintBox.innerHTML = "";
 }
